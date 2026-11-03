@@ -53,6 +53,7 @@ Every push to the main branch redeploys automatically.
 - Rooms are Supabase Broadcast channels named `morse:<room code>`. Nothing is stored.
 - Anyone with the site link and the same room code can join, so use a hard-to-guess code for a private chat.
 - Audio mode sends a signal when the key goes down and when it comes up. Friends hear the tone for as long as you hold. Network delay can stretch or squash a beep slightly.
+- Audio mode also draws the dots and dashes as people key. Your device decides whether each press was a dot or a dash and whether a pause was a letter gap or a word gap, and sends that with the key signal, so the strip stays correct even when the audio timing wobbles. Each row fades about 3.5 seconds after the keying stops. Letters are never shown. The Morse on/off button hides the strip and the choice is remembered.
 - Text mode sends the message as letters. It arrives as a strip of dots and dashes that plays as beeps, with a Text button to read it.
 - If `config.js` still has the placeholders, or the connection fails, the chat status shows LOCAL and messages stay on that device.
 

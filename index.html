@@ -1,1138 +1,2250 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#070b1b">
-<meta name="description" content="Learn Morse code with one key and chat with friends in dots and dashes.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%231a2152%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%279%27 fill=%27none%27 stroke=%27%23d8b46a%27 stroke-width=%272.5%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%273%27 fill=%27%2338f05f%27/%3E%3C/svg%3E">
-<style>
-:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-body{margin:0}
-img{max-width:100%}
-[hidden]{display:none!important}
-</style>
-<title>Morse Key</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
-<style>
-/* Layout concept: a handheld circuit-board reference card. Title and three tab pads on top, scrolling views in the middle, one brass key pad docked at the bottom. Dark on purpose, like the card. */
-:root{
-  --ground:#070b1b;
-  --board:#1a2152;
-  --board-deep:#111741;
-  --edge:#d9cfae;
-  --gold:#d8b46a;
-  --gold-dim:#8d7a50;
-  --silk:#ece6d3;
-  --silk-dim:#a9a8c2;
-  --led:#38f05f;
-  --amber:#ff8a2b;
-  --red:#ff5468;
-  --f-display:'Chakra Petch',system-ui,sans-serif;
-  --f-body:'IBM Plex Sans',system-ui,sans-serif;
-  --f-mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
-  color-scheme:dark;
-}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;background:var(--ground);color:var(--silk);
-  font:15px/1.5 var(--f-body);
-  padding-block:10px;
-  padding-left:max(16px,env(safe-area-inset-left,0px));
-  padding-right:max(16px,env(safe-area-inset-right,0px));
-  display:flex;flex-direction:column;
-  -webkit-tap-highlight-color:transparent;
-}
-button{font:inherit;color:inherit}
-.board{
-  position:relative;flex:1;min-height:0;width:100%;max-width:440px;margin:0 auto;
-  display:flex;flex-direction:column;
-  background:linear-gradient(180deg,var(--board),var(--board-deep));
-  border:2px solid var(--edge);border-radius:20px;overflow:hidden;
-  box-shadow:inset 0 0 0 4px rgba(0,0,0,.22);
-}
-.hole{position:absolute;top:12px;right:12px;width:14px;height:14px;border-radius:50%;background:var(--ground);border:2px solid var(--edge)}
-.head{padding:14px 42px 0 18px}
-.brand{display:flex;align-items:center;justify-content:space-between;font:600 15px var(--f-display);letter-spacing:.34em;color:var(--silk)}
-.funnel{width:18px;height:18px;color:var(--gold)}
-.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 14px 0 0}
-.tab{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  padding:9px 0;background:transparent;border:1.5px solid var(--gold-dim);border-radius:4px;
-  font:600 12px var(--f-display);letter-spacing:.18em;text-transform:uppercase;color:var(--silk-dim);cursor:pointer;
-}
-.tab.active{border-color:var(--gold);color:var(--silk);background:rgba(216,180,106,.13)}
-.tab.active .led{background:var(--led);box-shadow:0 0 8px 2px rgba(56,240,95,.65)}
-.led{display:inline-block;width:10px;height:10px;border-radius:50%;background:#222a4d;border:1px solid rgba(255,255,255,.18);flex:none}
-.led.on{background:var(--led);box-shadow:0 0 10px 3px rgba(56,240,95,.7);border-color:transparent}
-.led.rx.on{background:var(--amber);box-shadow:0 0 10px 3px rgba(255,138,43,.7)}
-:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#070b1b">
+  <meta name="description" content="Learn Morse code with one key and chat with friends in dots and dashes.">
+  <link rel="icon"
+    href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%277%27 fill=%27%231a2152%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%279%27 fill=%27none%27 stroke=%27%23d8b46a%27 stroke-width=%272.5%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%273%27 fill=%27%2338f05f%27/%3E%3C/svg%3E">
+  <style>
+    :root {
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px)
+    }
 
-.views{flex:1;min-height:0;overflow-y:auto;padding:12px 14px 14px;margin-top:10px;overscroll-behavior:contain}
-.view[hidden]{display:none}
-.view{display:flex;flex-direction:column;gap:12px}
-#view-chat:not([hidden]){height:100%;min-height:390px}
+    body {
+      margin: 0
+    }
 
-.panel{border:1.5px solid var(--gold-dim);border-radius:10px;padding:12px;background:rgba(0,0,0,.18);display:flex;flex-direction:column;gap:10px}
-.panel[hidden]{display:none}
-.chart{border:1.5px solid var(--gold-dim);border-radius:10px;padding:8px 6px 6px;background:rgba(0,0,0,.2)}
-.chart svg{display:block;width:100%;height:auto}
-.cap{font:600 11px var(--f-display);letter-spacing:.14em;text-transform:uppercase;color:var(--silk-dim);margin:0}
-.chart .cap{text-align:center;margin-top:4px}
-.note{margin:0;font-size:13px;color:var(--silk-dim)}
-.msg{margin:0;min-height:1.5em;text-align:center;color:var(--silk-dim);font-size:14px}
-.mono{font-family:var(--f-mono)}
-h2{margin:0;font:700 14px var(--f-display);letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+    img {
+      max-width: 100%
+    }
 
-/* chart */
-.edge{stroke:var(--gold-dim);stroke-width:1.5;fill:none}
-.edge.on{stroke:var(--led);filter:drop-shadow(0 0 3px var(--led))}
-.mk{fill:var(--gold)}
-.node{cursor:pointer}
-.node circle{fill:var(--board-deep);stroke:var(--gold);stroke-width:1.5}
-.node text{fill:var(--silk);font:600 10.5px var(--f-display);text-anchor:middle;dominant-baseline:central;pointer-events:none}
-.node.on circle{stroke:var(--led);fill:rgba(56,240,95,.2)}
-.node.cur circle{fill:var(--amber);stroke:var(--amber);filter:drop-shadow(0 0 4px var(--amber))}
-.node.cur text,.node.hit text,.node.miss text{fill:#10120a}
-.node.hit circle{fill:var(--led);stroke:var(--led);filter:drop-shadow(0 0 5px var(--led))}
-.node.miss circle{fill:var(--red);stroke:var(--red)}
-.root polygon{fill:var(--gold)}
-.root.on polygon{fill:var(--led);filter:drop-shadow(0 0 4px var(--led))}
+    [hidden] {
+      display: none !important
+    }
+  </style>
+  <title>Morse Key</title>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <style>
+    /* Layout concept: a handheld circuit-board reference card. Title and three tab pads on top, scrolling views in the middle, one brass key pad docked at the bottom. Dark on purpose, like the card. */
+    :root {
+      --ground: #070b1b;
+      --board: #1a2152;
+      --board-deep: #111741;
+      --edge: #d9cfae;
+      --gold: #d8b46a;
+      --gold-dim: #8d7a50;
+      --silk: #ece6d3;
+      --silk-dim: #a9a8c2;
+      --led: #38f05f;
+      --amber: #ff8a2b;
+      --red: #ff5468;
+      --f-display: 'Chakra Petch', system-ui, sans-serif;
+      --f-body: 'IBM Plex Sans', system-ui, sans-serif;
+      --f-mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+      color-scheme: dark;
+    }
 
-/* pads: dot = ring, dash = bar, like the traces on the card */
-.pat{display:inline-flex;align-items:center;gap:5px;vertical-align:middle}
-.pad{display:inline-block;border:2px solid var(--gold);flex:none}
-.pad.dot{width:11px;height:11px;border-radius:50%}
-.pad.dash{width:26px;height:11px;border-radius:3px}
-.pat.sm{gap:3px}
-.pat.sm .pad{border-width:1.5px}
-.pat.sm .pad.dot{width:7px;height:7px}
-.pat.sm .pad.dash{width:17px;height:7px}
-.pat.lit .pad{border-color:var(--led);background:rgba(56,240,95,.25)}
+    * {
+      box-sizing: border-box
+    }
 
-/* controls */
-.btn{
-  font:600 12px var(--f-display);letter-spacing:.14em;text-transform:uppercase;
-  padding:10px 14px;min-height:40px;background:transparent;border:1.5px solid var(--gold);border-radius:6px;cursor:pointer;
-}
-.btn.primary{background:var(--gold);color:#1b1608}
-.btn.small{min-height:32px;padding:6px 10px;font-size:11px}
-.btn:disabled{opacity:.4;cursor:default}
-.btn[aria-pressed="false"]{border-color:var(--gold-dim);color:var(--silk-dim)}
-.row{display:flex;flex-wrap:wrap;gap:8px}
-.row>.btn{flex:1 1 0;min-width:0}
-.seg{display:flex;border:1.5px solid var(--gold-dim);border-radius:6px;overflow:hidden}
-.seg button{flex:1;padding:8px 4px;background:transparent;border:0;border-right:1.5px solid var(--gold-dim);font:600 11px var(--f-display);letter-spacing:.14em;text-transform:uppercase;color:var(--silk-dim);cursor:pointer;min-width:0}
-.seg button:last-child{border-right:0}
-.seg button.active{background:var(--gold);color:#1b1608}
-.link{background:none;border:0;padding:4px 0;color:var(--silk-dim);font:500 12px var(--f-body);text-decoration:underline;cursor:pointer}
-label{font:600 11px var(--f-display);letter-spacing:.14em;text-transform:uppercase;color:var(--silk-dim)}
-input[type=text]{
-  width:100%;min-height:44px;margin:4px 0 4px;padding:8px 10px;
-  background:#0a0f2c;color:var(--silk);border:1.5px solid var(--gold-dim);border-radius:6px;font:500 16px var(--f-mono);
-}
-input[type=text]:focus{border-color:var(--gold);outline:none}
+    html,
+    body {
+      height: 100%
+    }
 
-/* learn */
-.xrow{display:flex;align-items:center;gap:14px}
-.big{font:700 64px/1 var(--f-display);color:var(--amber);min-width:64px;text-align:center}
-.xinfo{display:flex;flex-direction:column;gap:8px;min-width:0}
-.lcd{
-  background:#04130c;border:1.5px solid #1f5236;border-radius:8px;padding:10px 12px;
-  font:500 18px/1.4 var(--f-mono);color:var(--led);min-height:48px;word-break:break-word;text-shadow:0 0 6px rgba(56,240,95,.45);
-}
-.lcd .ph{color:#2f7a4c;text-shadow:none;font-size:14px}
-.caret{display:inline-block;width:.55em;height:1em;background:var(--led);vertical-align:-.15em;margin-left:2px;animation:blink 1s steps(2,start) infinite}
-@keyframes blink{to{visibility:hidden}}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{display:inline-flex;align-items:center;gap:7px;padding:4px 9px;border:1.5px solid var(--gold-dim);border-radius:4px;font:600 13px var(--f-mono)}
-.chip.cur{border-color:var(--gold);background:rgba(216,180,106,.14)}
-.target{font:700 84px/1 var(--f-display);text-align:center;color:var(--silk)}
-.target.ok{color:var(--led);text-shadow:0 0 18px rgba(56,240,95,.6)}
-.target.bad{color:var(--red)}
-.hintrow{display:flex;align-items:center;justify-content:center;min-height:24px;color:var(--silk-dim);font-size:13px}
-.prog{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:var(--silk-dim)}
-.lvls{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.lvls button{padding:8px 2px;background:transparent;border:1.5px solid var(--gold-dim);border-radius:4px;font:600 11px var(--f-display);letter-spacing:.06em;text-transform:uppercase;color:var(--silk-dim);cursor:pointer;min-width:0}
-.lvls button.active{background:var(--gold);border-color:var(--gold);color:#1b1608}
-.target.word{font-size:36px;line-height:1.25;letter-spacing:.1em;overflow-wrap:anywhere}
-.target.word span{color:var(--silk-dim)}
-.target.word .d{color:var(--led)}
-.target.word .c{color:var(--amber);text-decoration:underline;text-underline-offset:6px}
-.target.word.ok span{color:var(--led)}
-.target.word.bad .c{color:var(--red)}
-.heard{font:700 22px/1.25 var(--f-display);color:var(--silk-dim);text-align:center;min-height:1.3em;overflow-wrap:anywhere;padding:8px 0}
-.heard.on{color:var(--amber)}
-#textPane:not([hidden]){display:flex;flex-direction:column;gap:8px;flex:1;min-height:0}
+    body {
+      margin: 0;
+      background: var(--ground);
+      color: var(--silk);
+      font: 15px/1.5 var(--f-body);
+      padding-block: 10px;
+      padding-left: max(16px, env(safe-area-inset-left, 0px));
+      padding-right: max(16px, env(safe-area-inset-right, 0px));
+      display: flex;
+      flex-direction: column;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-/* chat */
-#room:not([hidden]){display:flex;flex-direction:column;gap:8px;flex:1;min-height:0}
-.roombar{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.roombar b{font:600 15px var(--f-mono);color:var(--silk);overflow-wrap:anywhere}
-.status{display:inline-flex;align-items:center;gap:7px;font:600 11px var(--f-display);letter-spacing:.14em;color:var(--silk-dim)}
-.status.up{color:var(--led)}
-.log{flex:1;min-height:90px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:2px}
-.empty{margin:auto;text-align:center;color:var(--silk-dim);font-size:13px;max-width:26ch}
-.m{max-width:90%;align-self:flex-start;padding:7px 10px 8px;border:1.5px solid var(--gold-dim);border-radius:8px;background:rgba(255,255,255,.03)}
-.m.me{align-self:flex-end;border-color:var(--gold);background:rgba(216,180,106,.08)}
-.who{display:flex;align-items:center;gap:7px;font:600 11px var(--f-display);letter-spacing:.12em;text-transform:uppercase;color:var(--silk-dim)}
-.dotc{width:8px;height:8px;border-radius:50%;display:inline-block}
-.play{margin-left:auto;background:none;border:1.5px solid var(--gold-dim);border-radius:4px;color:var(--silk-dim);font-size:10px;padding:2px 7px;cursor:pointer}
-.m .txt{font:500 17px/1.35 var(--f-mono);overflow-wrap:anywhere;margin-top:6px}
-.m{min-width:0}
-.wave{display:flex;align-items:center;gap:8px;margin-top:6px;height:14px;overflow:hidden}
-.wave .lt{flex:none}
-.wg{width:10px;flex:none}
-.acts{display:flex;gap:8px;margin-top:8px}
-.acts .play{margin-left:0;padding:6px 12px;font:600 11px var(--f-display);letter-spacing:.12em}
-.acts .play.go{background:var(--gold);border-color:var(--gold);color:#1b1608}
+    button {
+      font: inherit;
+      color: inherit
+    }
 
-/* dock */
-.dock{
-  display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;
-  padding:10px 14px 12px;border-top:1.5px solid var(--gold-dim);background:rgba(0,0,0,.24);
-}
-.sig{display:flex;flex-direction:column;gap:3px;min-width:0}
-.lamps{display:flex;gap:12px}
-.lamp{display:inline-flex;align-items:center;gap:6px;font:600 10px var(--f-display);letter-spacing:.16em;color:var(--silk-dim)}
-.live{font:700 38px/1.05 var(--f-display);color:var(--silk-dim);min-height:40px}
-.live.guess{color:var(--amber)}
-.live.ok{color:var(--led);text-shadow:0 0 14px rgba(56,240,95,.6)}
-.live.bad{color:var(--red)}
-.sym{min-height:14px}
-.key{
-  position:relative;width:98px;height:98px;border-radius:50%;
-  border:3px solid var(--gold);cursor:pointer;
-  background:radial-gradient(circle at 50% 36%,#2c367a,#0f1438 72%);
-  font:700 12px var(--f-display);letter-spacing:.22em;color:var(--silk);
-  touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
-  box-shadow:0 4px 0 rgba(0,0,0,.35);
-  transition:box-shadow .06s,border-color .06s,transform .06s;
-}
-.key::before{content:"";position:absolute;inset:8px;border-radius:50%;border:1.5px dashed var(--gold-dim)}
-.key.down{
-  border-color:var(--led);transform:translateY(2px) scale(.97);
-  background:radial-gradient(circle at 50% 50%,rgba(56,240,95,.4),#0f1438 78%);
-  box-shadow:0 0 0 5px rgba(56,240,95,.16),0 0 34px 8px rgba(56,240,95,.5);
-}
-.ctl{display:flex;flex-direction:column;gap:8px;align-items:stretch;min-width:0}
-.ctl .seg button{padding:6px 0;font-size:10px;letter-spacing:.08em}
+    .board {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      max-width: 440px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(180deg, var(--board), var(--board-deep));
+      border: 2px solid var(--edge);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 4px rgba(0, 0, 0, .22);
+    }
 
-/* guide */
-.manual{display:flex;flex-direction:column;gap:18px}
-.manual h1{margin:0;font:700 20px/1.2 var(--f-display);letter-spacing:.06em;text-transform:uppercase}
-.manual section{display:flex;flex-direction:column;gap:8px}
-.manual p{margin:0;color:var(--silk)}
-.manual ol,.manual ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
-.manual ol{counter-reset:s}
-.manual ol li{counter-increment:s;position:relative;padding-left:34px}
-.manual ol li::before{content:counter(s);position:absolute;left:0;top:1px;width:24px;height:24px;border:1.5px solid var(--gold);border-radius:4px;text-align:center;font:600 12px/21px var(--f-mono);color:var(--gold)}
-.manual ul li{position:relative;padding-left:18px}
-.manual ul li::before{content:"";position:absolute;left:3px;top:.6em;width:7px;height:7px;border-radius:50%;border:1.5px solid var(--gold)}
-.manual b{font-weight:600;color:var(--silk)}
-.manual small{color:var(--silk-dim)}
-.tl{display:flex;align-items:center;gap:6px;padding:10px 12px;border:1.5px solid var(--gold-dim);border-radius:8px;background:rgba(0,0,0,.2);flex-wrap:wrap}
-.tl i{display:inline-block;height:14px;border-radius:3px;background:var(--led);box-shadow:0 0 8px rgba(56,240,95,.5)}
-.tl i.gap{background:transparent;box-shadow:none;border:1.5px dashed var(--gold-dim)}
-.tl span{font:500 12px var(--f-mono);color:var(--silk-dim);margin-left:4px}
-.codes{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:6px}
-.code{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1.5px solid var(--gold-dim);border-radius:4px;min-width:0}
-.code .ch{font:700 16px var(--f-mono);width:1.1em;color:var(--silk)}
-.tbl{display:flex;flex-direction:column;border:1.5px solid var(--gold-dim);border-radius:8px;overflow:hidden}
-.tbl div{display:grid;grid-template-columns:70px 1fr;gap:10px;align-items:center;padding:8px 10px;border-top:1.5px solid var(--gold-dim)}
-.tbl div:first-child{border-top:0}
-.tbl .n{font:700 14px var(--f-mono);color:var(--amber)}
-.tbl .d{min-width:0;display:flex;flex-direction:column;gap:3px;font-size:14px}
+    .hole {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--ground);
+      border: 2px solid var(--edge)
+    }
 
-@media (prefers-reduced-motion:reduce){
-  .caret{animation:none}
-  .key{transition:none}
-}
-@media (max-width:360px){
-  .key{width:88px;height:88px}
-  .big{font-size:52px;min-width:52px}
-  .live{font-size:32px}
-}
-</style>
+    .head {
+      padding: 14px 42px 0 18px
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font: 600 15px var(--f-display);
+      letter-spacing: .34em;
+      color: var(--silk)
+    }
+
+    .funnel {
+      width: 18px;
+      height: 18px;
+      color: var(--gold)
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 12px 14px 0 0
+    }
+
+    .tab {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 0;
+      background: transparent;
+      border: 1.5px solid var(--gold-dim);
+      border-radius: 4px;
+      font: 600 12px var(--f-display);
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--silk-dim);
+      cursor: pointer;
+    }
+
+    .tab.active {
+      border-color: var(--gold);
+      color: var(--silk);
+      background: rgba(216, 180, 106, .13)
+    }
+
+    .tab.active .led {
+      background: var(--led);
+      box-shadow: 0 0 8px 2px rgba(56, 240, 95, .65)
+    }
+
+    .led {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #222a4d;
+      border: 1px solid rgba(255, 255, 255, .18);
+      flex: none
+    }
+
+    .led.on {
+      background: var(--led);
+      box-shadow: 0 0 10px 3px rgba(56, 240, 95, .7);
+      border-color: transparent
+    }
+
+    .led.rx.on {
+      background: var(--amber);
+      box-shadow: 0 0 10px 3px rgba(255, 138, 43, .7)
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--amber);
+      outline-offset: 2px
+    }
+
+    .views {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 12px 14px 14px;
+      margin-top: 10px;
+      overscroll-behavior: contain
+    }
+
+    .view[hidden] {
+      display: none
+    }
+
+    .view {
+      display: flex;
+      flex-direction: column;
+      gap: 12px
+    }
+
+    #view-chat:not([hidden]) {
+      height: 100%;
+      min-height: 390px
+    }
+
+    .panel {
+      border: 1.5px solid var(--gold-dim);
+      border-radius: 10px;
+      padding: 12px;
+      background: rgba(0, 0, 0, .18);
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+
+    .panel[hidden] {
+      display: none
+    }
+
+    .chart {
+      border: 1.5px solid var(--gold-dim);
+      border-radius: 10px;
+      padding: 8px 6px 6px;
+      background: rgba(0, 0, 0, .2)
+    }
+
+    .chart svg {
+      display: block;
+      width: 100%;
+      height: auto
+    }
+
+    .cap {
+      font: 600 11px var(--f-display);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--silk-dim);
+      margin: 0
+    }
+
+    .chart .cap {
+      text-align: center;
+      margin-top: 4px
+    }
+
+    .note {
+      margin: 0;
+      font-size: 13px;
+      color: var(--silk-dim)
+    }
+
+    .msg {
+      margin: 0;
+      min-height: 1.5em;
+      text-align: center;
+      color: var(--silk-dim);
+      font-size: 14px
+    }
+
+    .mono {
+      font-family: var(--f-mono)
+    }
+
+    h2 {
+      margin: 0;
+      font: 700 14px var(--f-display);
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--gold)
+    }
+
+    /* chart */
+    .edge {
+      stroke: var(--gold-dim);
+      stroke-width: 1.5;
+      fill: none
+    }
+
+    .edge.on {
+      stroke: var(--led);
+      filter: drop-shadow(0 0 3px var(--led))
+    }
+
+    .mk {
+      fill: var(--gold)
+    }
+
+    .node {
+      cursor: pointer
+    }
+
+    .node circle {
+      fill: var(--board-deep);
+      stroke: var(--gold);
+      stroke-width: 1.5
+    }
+
+    .node text {
+      fill: var(--silk);
+      font: 600 10.5px var(--f-display);
+      text-anchor: middle;
+      dominant-baseline: central;
+      pointer-events: none
+    }
+
+    .node.on circle {
+      stroke: var(--led);
+      fill: rgba(56, 240, 95, .2)
+    }
+
+    .node.cur circle {
+      fill: var(--amber);
+      stroke: var(--amber);
+      filter: drop-shadow(0 0 4px var(--amber))
+    }
+
+    .node.cur text,
+    .node.hit text,
+    .node.miss text {
+      fill: #10120a
+    }
+
+    .node.hit circle {
+      fill: var(--led);
+      stroke: var(--led);
+      filter: drop-shadow(0 0 5px var(--led))
+    }
+
+    .node.miss circle {
+      fill: var(--red);
+      stroke: var(--red)
+    }
+
+    .root polygon {
+      fill: var(--gold)
+    }
+
+    .root.on polygon {
+      fill: var(--led);
+      filter: drop-shadow(0 0 4px var(--led))
+    }
+
+    /* pads: dot = ring, dash = bar, like the traces on the card */
+    .pat {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      vertical-align: middle
+    }
+
+    .pad {
+      display: inline-block;
+      border: 2px solid var(--gold);
+      flex: none
+    }
+
+    .pad.dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%
+    }
+
+    .pad.dash {
+      width: 26px;
+      height: 11px;
+      border-radius: 3px
+    }
+
+    .pat.sm {
+      gap: 3px
+    }
+
+    .pat.sm .pad {
+      border-width: 1.5px
+    }
+
+    .pat.sm .pad.dot {
+      width: 7px;
+      height: 7px
+    }
+
+    .pat.sm .pad.dash {
+      width: 17px;
+      height: 7px
+    }
+
+    .pat.lit .pad {
+      border-color: var(--led);
+      background: rgba(56, 240, 95, .25)
+    }
+
+    /* controls */
+    .btn {
+      font: 600 12px var(--f-display);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      padding: 10px 14px;
+      min-height: 40px;
+      background: transparent;
+      border: 1.5px solid var(--gold);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      background: var(--gold);
+      color: #1b1608
+    }
+
+    .btn.small {
+      min-height: 32px;
+      padding: 6px 10px;
+      font-size: 11px
+    }
+
+    .btn:disabled {
+      opacity: .4;
+      cursor: default
+    }
+
+    .btn[aria-pressed="false"] {
+      border-color: var(--gold-dim);
+      color: var(--silk-dim)
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px
+    }
+
+    .row>.btn {
+      flex: 1 1 0;
+      min-width: 0
+    }
+
+    .seg {
+      display: flex;
+      border: 1.5px solid var(--gold-dim);
+      border-radius: 6px;
+      overflow: hidden
+    }
+
+    .seg button {
+      flex: 1;
+      padding: 8px 4px;
+      background: transparent;
+      border: 0;
+      border-right: 1.5px solid var(--gold-dim);
+      font: 600 11px var(--f-display);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--silk-dim);
+      cursor: pointer;
+      min-width: 0
+    }
+
+    .seg button:last-child {
+      border-right: 0
+    }
+
+    .seg button.active {
+      background: var(--gold);
+      color: #1b1608
+    }
+
+    .link {
+      background: none;
+      border: 0;
+      padding: 4px 0;
+      color: var(--silk-dim);
+      font: 500 12px var(--f-body);
+      text-decoration: underline;
+      cursor: pointer
+    }
+
+    label {
+      font: 600 11px var(--f-display);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--silk-dim)
+    }
+
+    input[type=text] {
+      width: 100%;
+      min-height: 44px;
+      margin: 4px 0 4px;
+      padding: 8px 10px;
+      background: #0a0f2c;
+      color: var(--silk);
+      border: 1.5px solid var(--gold-dim);
+      border-radius: 6px;
+      font: 500 16px var(--f-mono);
+    }
+
+    input[type=text]:focus {
+      border-color: var(--gold);
+      outline: none
+    }
+
+    /* learn */
+    .xrow {
+      display: flex;
+      align-items: center;
+      gap: 14px
+    }
+
+    .big {
+      font: 700 64px/1 var(--f-display);
+      color: var(--amber);
+      min-width: 64px;
+      text-align: center
+    }
+
+    .xinfo {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0
+    }
+
+    .lcd {
+      background: #04130c;
+      border: 1.5px solid #1f5236;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font: 500 18px/1.4 var(--f-mono);
+      color: var(--led);
+      min-height: 48px;
+      word-break: break-word;
+      text-shadow: 0 0 6px rgba(56, 240, 95, .45);
+    }
+
+    .lcd .ph {
+      color: #2f7a4c;
+      text-shadow: none;
+      font-size: 14px
+    }
+
+    .caret {
+      display: inline-block;
+      width: .55em;
+      height: 1em;
+      background: var(--led);
+      vertical-align: -.15em;
+      margin-left: 2px;
+      animation: blink 1s steps(2, start) infinite
+    }
+
+    @keyframes blink {
+      to {
+        visibility: hidden
+      }
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 4px 9px;
+      border: 1.5px solid var(--gold-dim);
+      border-radius: 4px;
+      font: 600 13px var(--f-mono)
+    }
+
+    .chip.cur {
+      border-color: var(--gold);
+      background: rgba(216, 180, 106, .14)
+    }
+
+    .target {
+      font: 700 84px/1 var(--f-display);
+      text-align: center;
+      color: var(--silk)
+    }
+
+    .target.ok {
+      color: var(--led);
+      text-shadow: 0 0 18px rgba(56, 240, 95, .6)
+    }
+
+    .target.bad {
+      color: var(--red)
+    }
+
+    .hintrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 24px;
+      color: var(--silk-dim);
+      font-size: 13px
+    }
+
+    .prog {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--silk-dim)
+    }
+
+    .lvls {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px
+    }
+
+    .lvls button {
+      padding: 8px 2px;
+      background: transparent;
+      border: 1.5px solid var(--gold-dim);
+      border-radius: 4px;
+      font: 600 11px var(--f-display);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--silk-dim);
+      cursor: pointer;
+      min-width: 0
+    }
+
+    .lvls button.active {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #1b1608
+    }
+
+    .target.word {
+      font-size: 36px;
+      line-height: 1.25;
+      letter-spacing: .1em;
+      overflow-wrap: anywhere
+    }
+
+    .target.word span {
+      color: var(--silk-dim)
+    }
+
+    .target.word .d {
+      color: var(--led)
+    }
+
+    .target.word .c {
+      color: var(--amber);
+      text-decoration: underline;
+      text-underline-offset: 6px
+    }
+
+    .target.word.ok span {
+      color: var(--led)
+    }
+
+    .target.word.bad .c {
+      color: var(--red)
+    }
+
+    .heard {
+      font: 700 22px/1.25 var(--f-display);
+      color: var(--silk-dim);
+      text-align: center;
+      min-height: 1.3em;
+      overflow-wrap: anywhere;
+      padding: 8px 0
+    }
+
+    .heard.on {
+      color: var(--amber)
+    }
+
+    .strips {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 64px;
+      padding: 10px;
+      border: 1.5px dashed var(--gold-dim);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, .2)
+    }
+
+    .strips:empty {
+      align-items: center;
+      justify-content: center
+    }
+
+    .strips:empty::before {
+      content: "Dots and dashes appear here as you key";
+      color: var(--silk-dim);
+      font-size: 12px;
+      text-align: center
+    }
+
+    .srow {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      opacity: 1;
+      transition: opacity .45s ease
+    }
+
+    .srow.fade {
+      opacity: 0
+    }
+
+    .slabel {
+      flex: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      width: 76px;
+      font: 600 11px var(--f-display);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--silk-dim);
+      padding-top: 1px;
+      overflow: hidden
+    }
+
+    .slabel b {
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .sline {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px
+    }
+
+    .sline .pad {
+      border-color: var(--led);
+      background: rgba(56, 240, 95, .25)
+    }
+
+    .sline .pad.hold {
+      border-color: var(--amber);
+      background: rgba(255, 138, 43, .35)
+    }
+
+    .sline .gap {
+      width: 10px;
+      flex: none
+    }
+
+    .sline .gap.word {
+      width: 24px
+    }
+
+    #textPane:not([hidden]) {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+      min-height: 0
+    }
+
+    /* chat */
+    #room:not([hidden]) {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+      min-height: 0
+    }
+
+    .roombar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px
+    }
+
+    .roombar b {
+      font: 600 15px var(--f-mono);
+      color: var(--silk);
+      overflow-wrap: anywhere
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font: 600 11px var(--f-display);
+      letter-spacing: .14em;
+      color: var(--silk-dim)
+    }
+
+    .status.up {
+      color: var(--led)
+    }
+
+    .log {
+      flex: 1;
+      min-height: 90px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 2px
+    }
+
+    .empty {
+      margin: auto;
+      text-align: center;
+      color: var(--silk-dim);
+      font-size: 13px;
+      max-width: 26ch
+    }
+
+    .m {
+      max-width: 90%;
+      align-self: flex-start;
+      padding: 7px 10px 8px;
+      border: 1.5px solid var(--gold-dim);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .03)
+    }
+
+    .m.me {
+      align-self: flex-end;
+      border-color: var(--gold);
+      background: rgba(216, 180, 106, .08)
+    }
+
+    .who {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font: 600 11px var(--f-display);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--silk-dim)
+    }
+
+    .dotc {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block
+    }
+
+    .play {
+      margin-left: auto;
+      background: none;
+      border: 1.5px solid var(--gold-dim);
+      border-radius: 4px;
+      color: var(--silk-dim);
+      font-size: 10px;
+      padding: 2px 7px;
+      cursor: pointer
+    }
+
+    .m .txt {
+      font: 500 17px/1.35 var(--f-mono);
+      overflow-wrap: anywhere;
+      margin-top: 6px
+    }
+
+    .m {
+      min-width: 0
+    }
+
+    .wave {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+      height: 14px;
+      overflow: hidden
+    }
+
+    .wave .lt {
+      flex: none
+    }
+
+    .wg {
+      width: 10px;
+      flex: none
+    }
+
+    .acts {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px
+    }
+
+    .acts .play {
+      margin-left: 0;
+      padding: 6px 12px;
+      font: 600 11px var(--f-display);
+      letter-spacing: .12em
+    }
+
+    .acts .play.go {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #1b1608
+    }
+
+    /* dock */
+    .dock {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 14px 12px;
+      border-top: 1.5px solid var(--gold-dim);
+      background: rgba(0, 0, 0, .24);
+    }
+
+    .sig {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 0
+    }
+
+    .lamps {
+      display: flex;
+      gap: 12px
+    }
+
+    .lamp {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font: 600 10px var(--f-display);
+      letter-spacing: .16em;
+      color: var(--silk-dim)
+    }
+
+    .live {
+      font: 700 38px/1.05 var(--f-display);
+      color: var(--silk-dim);
+      min-height: 40px
+    }
+
+    .live.guess {
+      color: var(--amber)
+    }
+
+    .live.ok {
+      color: var(--led);
+      text-shadow: 0 0 14px rgba(56, 240, 95, .6)
+    }
+
+    .live.bad {
+      color: var(--red)
+    }
+
+    .sym {
+      min-height: 14px
+    }
+
+    .key {
+      position: relative;
+      width: 98px;
+      height: 98px;
+      border-radius: 50%;
+      border: 3px solid var(--gold);
+      cursor: pointer;
+      background: radial-gradient(circle at 50% 36%, #2c367a, #0f1438 72%);
+      font: 700 12px var(--f-display);
+      letter-spacing: .22em;
+      color: var(--silk);
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      box-shadow: 0 4px 0 rgba(0, 0, 0, .35);
+      transition: box-shadow .06s, border-color .06s, transform .06s;
+    }
+
+    .key::before {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border-radius: 50%;
+      border: 1.5px dashed var(--gold-dim)
+    }
+
+    .key.down {
+      border-color: var(--led);
+      transform: translateY(2px) scale(.97);
+      background: radial-gradient(circle at 50% 50%, rgba(56, 240, 95, .4), #0f1438 78%);
+      box-shadow: 0 0 0 5px rgba(56, 240, 95, .16), 0 0 34px 8px rgba(56, 240, 95, .5);
+    }
+
+    .ctl {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: stretch;
+      min-width: 0
+    }
+
+    .ctl .seg button {
+      padding: 6px 0;
+      font-size: 10px;
+      letter-spacing: .08em
+    }
+
+    /* guide */
+    .manual {
+      display: flex;
+      flex-direction: column;
+      gap: 18px
+    }
+
+    .manual h1 {
+      margin: 0;
+      font: 700 20px/1.2 var(--f-display);
+      letter-spacing: .06em;
+      text-transform: uppercase
+    }
+
+    .manual section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .manual p {
+      margin: 0;
+      color: var(--silk)
+    }
+
+    .manual ol,
+    .manual ul {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .manual ol {
+      counter-reset: s
+    }
+
+    .manual ol li {
+      counter-increment: s;
+      position: relative;
+      padding-left: 34px
+    }
+
+    .manual ol li::before {
+      content: counter(s);
+      position: absolute;
+      left: 0;
+      top: 1px;
+      width: 24px;
+      height: 24px;
+      border: 1.5px solid var(--gold);
+      border-radius: 4px;
+      text-align: center;
+      font: 600 12px/21px var(--f-mono);
+      color: var(--gold)
+    }
+
+    .manual ul li {
+      position: relative;
+      padding-left: 18px
+    }
+
+    .manual ul li::before {
+      content: "";
+      position: absolute;
+      left: 3px;
+      top: .6em;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      border: 1.5px solid var(--gold)
+    }
+
+    .manual b {
+      font-weight: 600;
+      color: var(--silk)
+    }
+
+    .manual small {
+      color: var(--silk-dim)
+    }
+
+    .tl {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 12px;
+      border: 1.5px solid var(--gold-dim);
+      border-radius: 8px;
+      background: rgba(0, 0, 0, .2);
+      flex-wrap: wrap
+    }
+
+    .tl i {
+      display: inline-block;
+      height: 14px;
+      border-radius: 3px;
+      background: var(--led);
+      box-shadow: 0 0 8px rgba(56, 240, 95, .5)
+    }
+
+    .tl i.gap {
+      background: transparent;
+      box-shadow: none;
+      border: 1.5px dashed var(--gold-dim)
+    }
+
+    .tl span {
+      font: 500 12px var(--f-mono);
+      color: var(--silk-dim);
+      margin-left: 4px
+    }
+
+    .codes {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+      gap: 6px
+    }
+
+    .code {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border: 1.5px solid var(--gold-dim);
+      border-radius: 4px;
+      min-width: 0
+    }
+
+    .code .ch {
+      font: 700 16px var(--f-mono);
+      width: 1.1em;
+      color: var(--silk)
+    }
+
+    .tbl {
+      display: flex;
+      flex-direction: column;
+      border: 1.5px solid var(--gold-dim);
+      border-radius: 8px;
+      overflow: hidden
+    }
+
+    .tbl div {
+      display: grid;
+      grid-template-columns: 70px 1fr;
+      gap: 10px;
+      align-items: center;
+      padding: 8px 10px;
+      border-top: 1.5px solid var(--gold-dim)
+    }
+
+    .tbl div:first-child {
+      border-top: 0
+    }
+
+    .tbl .n {
+      font: 700 14px var(--f-mono);
+      color: var(--amber)
+    }
+
+    .tbl .d {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      font-size: 14px
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+      .caret {
+        animation: none
+      }
+
+      .key {
+        transition: none
+      }
+
+      .srow {
+        transition: none
+      }
+    }
+
+    @media (max-width:360px) {
+      .key {
+        width: 88px;
+        height: 88px
+      }
+
+      .big {
+        font-size: 52px;
+        min-width: 52px
+      }
+
+      .live {
+        font-size: 32px
+      }
+    }
+  </style>
 </head>
+
 <body>
 
 
-<div class="board">
-  <i class="hole"></i>
-  <header class="head">
-    <div class="brand"><span>MORSE</span><svg class="funnel" viewBox="0 0 20 20" aria-hidden="true"><path d="M2 3h16l-6 7v6l-4 2v-8z" fill="currentColor"/></svg><span>CODE</span></div>
-    <nav class="tabs" role="tablist" aria-label="Sections">
-      <button class="tab" role="tab" id="tab-learn" data-v="learn" aria-controls="view-learn"><i class="led"></i>Learn</button>
-      <button class="tab" role="tab" id="tab-chat" data-v="chat" aria-controls="view-chat"><i class="led"></i>Chat</button>
-      <button class="tab" role="tab" id="tab-guide" data-v="guide" aria-controls="view-guide"><i class="led"></i>Guide</button>
-    </nav>
-  </header>
+  <div class="board">
+    <i class="hole"></i>
+    <header class="head">
+      <div class="brand"><span>MORSE</span><svg class="funnel" viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M2 3h16l-6 7v6l-4 2v-8z" fill="currentColor" />
+        </svg><span>CODE</span></div>
+      <nav class="tabs" role="tablist" aria-label="Sections">
+        <button class="tab" role="tab" id="tab-learn" data-v="learn" aria-controls="view-learn"><i
+            class="led"></i>Learn</button>
+        <button class="tab" role="tab" id="tab-chat" data-v="chat" aria-controls="view-chat"><i
+            class="led"></i>Chat</button>
+        <button class="tab" role="tab" id="tab-guide" data-v="guide" aria-controls="view-guide"><i
+            class="led"></i>Guide</button>
+      </nav>
+    </header>
 
-  <main class="views">
+    <main class="views">
 
-    <!-- LEARN -->
-    <section class="view" id="view-learn" role="tabpanel" aria-labelledby="tab-learn">
-      <div class="chart">
-        <svg id="tree" viewBox="0 0 352 212" role="img" aria-label="Morse code chart. Start at the funnel. A dot goes left and a dash goes right."></svg>
-        <p class="cap">Start at the funnel. Dot goes left, dash goes right.</p>
-      </div>
-      <div class="seg" id="lmode" role="group" aria-label="Learn mode">
-        <button data-m="explore">Free key</button>
-        <button data-m="train">Train</button>
-      </div>
+      <!-- LEARN -->
+      <section class="view" id="view-learn" role="tabpanel" aria-labelledby="tab-learn">
+        <div class="chart">
+          <svg id="tree" viewBox="0 0 352 212" role="img"
+            aria-label="Morse code chart. Start at the funnel. A dot goes left and a dash goes right."></svg>
+          <p class="cap">Start at the funnel. Dot goes left, dash goes right.</p>
+        </div>
+        <div class="seg" id="lmode" role="group" aria-label="Learn mode">
+          <button data-m="explore">Free key</button>
+          <button data-m="train">Train</button>
+        </div>
 
-      <div class="panel" id="p-explore">
-        <div class="xrow">
-          <div class="big" id="xLetter">S</div>
-          <div class="xinfo">
-            <p class="cap" id="xCap">Example. Tap the key three times to spell S.</p>
-            <div id="xPat"></div>
+        <div class="panel" id="p-explore">
+          <div class="xrow">
+            <div class="big" id="xLetter">S</div>
+            <div class="xinfo">
+              <p class="cap" id="xCap">Example. Tap the key three times to spell S.</p>
+              <div id="xPat"></div>
+            </div>
+          </div>
+          <div class="lcd" id="xText" aria-live="polite"></div>
+          <div class="row">
+            <button class="btn" id="xListen" type="button">Listen</button>
+            <button class="btn" id="xClear" type="button">Clear</button>
+          </div>
+          <p class="note">Tap any letter on the chart to see and hear its pattern.</p>
+        </div>
+
+        <div class="panel" id="p-train" hidden>
+          <div class="lvls" id="levels" role="group" aria-label="Level"></div>
+          <div class="chips" id="chips"></div>
+          <div class="target" id="target" aria-live="polite">E</div>
+          <div class="hintrow" id="hintRow"></div>
+          <p class="msg" id="tmsg" aria-live="polite"></p>
+          <div class="row">
+            <button class="btn" id="tListen" type="button">Listen</button>
+            <button class="btn" id="tHint" type="button">Show hint</button>
+          </div>
+          <div class="prog"><span id="tProg"></span><button class="link" id="tReset" type="button">Reset
+              progress</button></div>
+        </div>
+      </section>
+
+      <!-- CHAT -->
+      <section class="view" id="view-chat" role="tabpanel" aria-labelledby="tab-chat" hidden>
+        <div class="panel" id="join">
+          <h2>Join a room</h2>
+          <div>
+            <label for="nick">Your name</label>
+            <input type="text" id="nick" maxlength="14" autocomplete="off" spellcheck="false">
+          </div>
+          <div>
+            <label for="roomCode">Room code</label>
+            <input type="text" id="roomCode" maxlength="32" autocomplete="off" autocapitalize="off" spellcheck="false">
+          </div>
+          <div class="row">
+            <button class="btn primary" id="joinBtn" type="button">Join</button>
+            <button class="btn" id="newRoom" type="button">New room</button>
+          </div>
+          <p class="note" id="joinNote">Friends who enter the same room code hear your key live. You can also send them
+            text messages.</p>
+        </div>
+
+        <div id="room" hidden>
+          <div class="roombar">
+            <div><span class="cap">Room</span> <b id="roomName"></b></div>
+            <span class="row" style="flex:none;align-items:center;flex-wrap:nowrap"><span class="status" id="status"><i
+                  class="led"></i><span id="statusText">LIVE</span></span><button class="btn small" id="leaveBtn"
+                type="button" style="flex:none">Leave</button></span>
+          </div>
+          <div class="roombar">
+            <div class="chips" id="peers"></div>
+            <button class="btn small" id="copyBtn" type="button">Copy code</button>
+          </div>
+          <div class="seg" id="cmode" role="group" aria-label="Chat mode"><button type="button"
+              data-m="audio">Audio</button><button type="button" data-m="text">Text</button></div>
+          <div class="panel" id="audioPane">
+            <div class="heard" id="heard">Quiet</div>
+            <div class="strips" id="strips" aria-hidden="true"></div>
+            <div class="roombar">
+              <p class="note">Hold the key to talk. Friends in this room hear each beep as you press it, and you hear
+                theirs. Keep your sound on and this page open.</p>
+              <button class="btn small" id="morseBtn" type="button" aria-pressed="true" style="flex:none">Morse
+                on</button>
+            </div>
+          </div>
+          <div id="textPane">
+            <div class="log" id="log" aria-live="polite"></div>
+            <div class="lcd" id="draft"></div>
+            <div class="row">
+              <button class="btn" id="bk" type="button">Erase</button>
+              <button class="btn" id="sp" type="button">Space</button>
+              <button class="btn primary" id="send" type="button">Send</button>
+            </div>
+            <div class="roombar">
+              <p class="note">Key AR to send. Eight dots erase.</p>
+              <button class="btn small" id="autoBtn" type="button" aria-pressed="true" style="flex:none">Auto-play
+                on</button>
+            </div>
           </div>
         </div>
-        <div class="lcd" id="xText" aria-live="polite"></div>
-        <div class="row">
-          <button class="btn" id="xListen" type="button">Listen</button>
-          <button class="btn" id="xClear" type="button">Clear</button>
+      </section>
+
+      <!-- GUIDE -->
+      <section class="view" id="view-guide" role="tabpanel" aria-labelledby="tab-guide" hidden>
+        <div class="manual">
+          <section>
+            <h1>How to use Morse Key</h1>
+            <p>Morse Key has one button. You tap and hold it to send dots and dashes, and the page turns them into
+              letters. Learn teaches you the code. Chat lets you talk to friends with it.</p>
+          </section>
+
+          <section>
+            <h2>The key</h2>
+            <ol>
+              <li><b>Tap for a dot.</b> <span class="pat sm" data-pat="."></span> A quick press is a dot.</li>
+              <li><b>Hold for a dash.</b> <span class="pat sm" data-pat="-"></span> While you hold, the label on the key
+                says DOT. When you have held long enough it changes to DASH. Let go when it shows the one you want.</li>
+              <li><b>Pause to lock in a letter.</b> Stop for about half a second after your last press. The letter
+                appears on screen and in the big letter beside the key.</li>
+              <li><b>Pause longer for a space.</b> Wait about a second and a space is added between words.</li>
+              <li><b>Listen and watch.</b> Every press plays a beep and lights the green TX lamp. Incoming sound lights
+                the amber RX lamp.</li>
+            </ol>
+            <div class="tl" aria-hidden="true"><i style="width:14px"></i><i class="gap" style="width:14px"></i><i
+                style="width:42px"></i><span>A = dot, dash</span></div>
+            <p><small>A dash is held about three times as long as a dot. On a computer you can hold the space bar
+                instead of clicking the key.</small></p>
+            <p><b>Speed.</b> SLOW, MID and FAST sit beside the key. They set how long you hold for a dash and how long
+              the pauses are. Start on SLOW and move up when it feels easy. The sound button turns the beeps on or off.
+            </p>
+          </section>
+
+          <section>
+            <h2>Learn</h2>
+            <p><b>Free key</b> is for exploring. Key any letter and watch the chart: the path you took glows green and
+              the spot you are on glows orange. Your letters collect on the green screen. Tap a letter on the chart to
+              see its pattern and hear it.</p>
+            <p><b>Reading the chart.</b> Start at the funnel. A dot goes left and a dash goes right. A dot then a dash
+              lands on A.</p>
+            <p><b>Train</b> gives you one letter at a time.</p>
+            <ol>
+              <li>Pick a level. Each level adds new letters.</li>
+              <li>Key the big letter or word shown on screen. For a word, key one letter at a time and pause between
+                letters. Each correct letter turns green.</li>
+              <li>If you are right, the letter turns green and the next one appears. If you are wrong, you see what you
+                keyed next to the right pattern.</li>
+              <li>Press Listen to hear the letter. Press Show hint to see its dots and dashes. After two misses the hint
+                opens by itself.</li>
+              <li>A letter counts as learned after three correct answers, a word or phrase after two. Progress is saved
+                on this device.</li>
+            </ol>
+            <div class="tbl">
+              <div><span class="n">Level 1</span><span class="d">E T I A N M</span></div>
+              <div><span class="n">Level 2</span><span class="d">S U R W D K G O</span></div>
+              <div><span class="n">Level 3</span><span class="d">H V F L P J B X C Y Z Q</span></div>
+              <div><span class="n">Level 4</span><span class="d">0 1 2 3 4 5 6 7 8 9</span></div>
+              <div><span class="n">Words 1</span><span class="d">Short words such as EAT, MAN and SUN</span></div>
+              <div><span class="n">Words 2</span><span class="d">Longer words such as HELLO, MORSE and FRIEND</span>
+              </div>
+              <div><span class="n">Phrases</span><span class="d">SOS, THANK YOU, HOW ARE YOU and more</span></div>
+            </div>
+          </section>
+
+          <section>
+            <h2>Chat</h2>
+            <ol>
+              <li>Open the Chat tab. Type your name and a room code, or press New room to get a code.</li>
+              <li>Press Join. The status shows LIVE when you are connected.</li>
+              <li>Give the room code to your friends. They open this same page, enter the same code and press Join.
+                Their names appear under the room code.</li>
+              <li>Choose <b>Audio</b> or <b>Text</b> at the top of the room.</li>
+            </ol>
+            <p><b>Audio.</b> Hold the key to talk. Your friends hear each beep the moment you press it, just like a
+              telegraph. Their beeps play on your device the same way, and the line under the switch shows who is
+              keying. Everyone needs the page open and sound on. Each friend has their own pitch, so you can tell voices
+              apart.</p>
+            <p>Under that line, a strip draws the dots and dashes as they are keyed, yours and your friends'. It fades a
+              few seconds after the keying stops. Press Morse off to hide it. Try listening without it once the sounds
+              feel familiar.</p>
+            <p><b>Text.</b> Key a message and the letters appear on the green screen. To send, key AR (<span
+                class="pat sm" data-pat=".-.-."></span>) or press Send. To erase the last letter, key eight dots or
+              press Erase. Each message is sent as recorded audio. Friends see it as a strip of dots and dashes, and it
+              plays as beeps when it arrives. Press PLAY to hear it again. Press TEXT to read the message as letters,
+              and HIDE to put it away. A dot beside Text means a new message arrived while you were in Audio.</p>
+            <p><b>Who can chat.</b> Anyone with the site link and the same room code. Room codes are not secret, so pick
+              one that is hard to guess when you want a private chat.</p>
+            <p><small>Audio and messages are live only. Friends get what is sent while they are in the room, and nothing
+                is stored. If the status shows LOCAL, there is no live connection and messages stay on this
+                device.</small></p>
+          </section>
+
+          <section>
+            <h2>Cheat sheet</h2>
+            <div class="codes" id="codes"></div>
+          </section>
+
+          <section>
+            <h2>Special signals</h2>
+            <div class="tbl">
+              <div><span class="n">AR</span><span class="d">Send the message in Chat<span class="pat sm"
+                    data-pat=".-.-."></span></span></div>
+              <div><span class="n">ERR</span><span class="d">Erase the last letter in Chat<span class="pat sm"
+                    data-pat="........"></span></span></div>
+              <div><span class="n">.</span><span class="d">Full stop<span class="pat sm"
+                    data-pat=".-.-.-"></span></span></div>
+              <div><span class="n">,</span><span class="d">Comma<span class="pat sm" data-pat="--..--"></span></span>
+              </div>
+              <div><span class="n">?</span><span class="d">Question mark<span class="pat sm"
+                    data-pat="..--.."></span></span></div>
+              <div><span class="n">!</span><span class="d">Exclamation mark<span class="pat sm"
+                    data-pat="-.-.--"></span></span></div>
+              <div><span class="n">/</span><span class="d">Slash<span class="pat sm" data-pat="-..-."></span></span>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h2>If something is off</h2>
+            <ul>
+              <li><b>No sound.</b> Check that Sound is on and your phone is not on silent. Tap the key once so the
+                browser allows audio.</li>
+              <li><b>Dashes come out as dots.</b> Hold a little longer, or switch to SLOW.</li>
+              <li><b>Letters split in two.</b> You paused too long in the middle. Keep going at an even pace, or switch
+                to SLOW for longer gaps.</li>
+              <li><b>A question mark appears.</b> The pattern does not match a letter. Wait for it to lock in and try
+                again.</li>
+              <li><b>Chat says LOCAL.</b> The live connection did not open. Check your internet connection, then leave
+                the room and join again.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2>Tips</h2>
+            <ul>
+              <li><b>Think in rhythm.</b> Morse code has a musical rhythm. Think of A (·−) as "di-dah", not "dot dash".
+                Your taps will flow naturally.</li>
+              <li><b>Sound is essential.</b> Always use the audio. Professional operators read Morse by ear, not by eye.
+                Keep the volume up and let the beeps guide you.</li>
+              <li>Learn the sound of each letter, not the count of dots and dashes. Use Listen often.</li>
+              <li>Five short sessions a day work better than one long one.</li>
+              <li>Finish a level before you start the next. Chat is easier once the first two levels feel natural.</li>
+            </ul>
+          </section>
         </div>
-        <p class="note">Tap any letter on the chart to see and hear its pattern.</p>
+      </section>
+    </main>
+
+    <footer class="dock" id="dock">
+      <div class="sig">
+        <div class="lamps">
+          <span class="lamp"><i class="led" id="ledTx"></i>TX</span>
+          <span class="lamp"><i class="led rx" id="ledRx"></i>RX</span>
+        </div>
+        <div class="live" id="live" aria-live="polite">·</div>
+        <div class="sym" id="sym"></div>
       </div>
-
-      <div class="panel" id="p-train" hidden>
-        <div class="lvls" id="levels" role="group" aria-label="Level"></div>
-        <div class="chips" id="chips"></div>
-        <div class="target" id="target" aria-live="polite">E</div>
-        <div class="hintrow" id="hintRow"></div>
-        <p class="msg" id="tmsg" aria-live="polite"></p>
-        <div class="row">
-          <button class="btn" id="tListen" type="button">Listen</button>
-          <button class="btn" id="tHint" type="button">Show hint</button>
+      <button class="key" id="key" type="button" aria-label="Morse key. Tap for a dot, hold for a dash."><span
+          id="keyLabel">KEY</span></button>
+      <div class="ctl">
+        <div class="seg" id="speed" role="group" aria-label="Speed">
+          <button type="button" data-speed="slow">Slow</button>
+          <button type="button" data-speed="mid">Mid</button>
+          <button type="button" data-speed="fast">Fast</button>
         </div>
-        <div class="prog"><span id="tProg"></span><button class="link" id="tReset" type="button">Reset progress</button></div>
+        <button class="btn small" id="soundBtn" type="button" aria-pressed="true">Sound on</button>
       </div>
-    </section>
+    </footer>
+  </div>
 
-    <!-- CHAT -->
-    <section class="view" id="view-chat" role="tabpanel" aria-labelledby="tab-chat" hidden>
-      <div class="panel" id="join">
-        <h2>Join a room</h2>
-        <div>
-          <label for="nick">Your name</label>
-          <input type="text" id="nick" maxlength="14" autocomplete="off" spellcheck="false">
-        </div>
-        <div>
-          <label for="roomCode">Room code</label>
-          <input type="text" id="roomCode" maxlength="32" autocomplete="off" autocapitalize="off" spellcheck="false">
-        </div>
-        <div class="row">
-          <button class="btn primary" id="joinBtn" type="button">Join</button>
-          <button class="btn" id="newRoom" type="button">New room</button>
-        </div>
-        <p class="note" id="joinNote">Friends who enter the same room code hear your key live. You can also send them text messages.</p>
-      </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="config.js"></script>
+  <script src="supabase-room.js"></script>
+  <script>
+    (function () {
+      'use strict';
+      var $ = function (s, r) { return (r || document).querySelector(s) };
+      var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)) };
+      var store = {
+        get: function (k, d) { try { var v = localStorage.getItem('mk.' + k); return v == null ? d : JSON.parse(v) } catch (e) { return d } },
+        set: function (k, v) { try { localStorage.setItem('mk.' + k, JSON.stringify(v)) } catch (e) { } }
+      };
 
-      <div id="room" hidden>
-        <div class="roombar">
-          <div><span class="cap">Room</span> <b id="roomName"></b></div>
-          <span class="row" style="flex:none;align-items:center;flex-wrap:nowrap"><span class="status" id="status"><i class="led"></i><span id="statusText">LIVE</span></span><button class="btn small" id="leaveBtn" type="button" style="flex:none">Leave</button></span>
-        </div>
-        <div class="roombar">
-          <div class="chips" id="peers"></div>
-          <button class="btn small" id="copyBtn" type="button">Copy code</button>
-        </div>
-        <div class="seg" id="cmode" role="group" aria-label="Chat mode"><button type="button" data-m="audio">Audio</button><button type="button" data-m="text">Text</button></div>
-        <div class="panel" id="audioPane">
-          <div class="heard" id="heard">Quiet</div>
-          <p class="note">Hold the key to talk. Friends in this room hear each beep as you press it, and you hear theirs. Keep your sound on and this page open.</p>
-        </div>
-        <div id="textPane">
-        <div class="log" id="log" aria-live="polite"></div>
-        <div class="lcd" id="draft"></div>
-        <div class="row">
-          <button class="btn" id="bk" type="button">Erase</button>
-          <button class="btn" id="sp" type="button">Space</button>
-          <button class="btn primary" id="send" type="button">Send</button>
-        </div>
-        <div class="roombar">
-          <p class="note">Key AR to send. Eight dots erase.</p>
-          <button class="btn small" id="autoBtn" type="button" aria-pressed="true" style="flex:none">Auto-play on</button>
-        </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- GUIDE -->
-    <section class="view" id="view-guide" role="tabpanel" aria-labelledby="tab-guide" hidden>
-      <div class="manual">
-        <section>
-          <h1>How to use Morse Key</h1>
-          <p>Morse Key has one button. You tap and hold it to send dots and dashes, and the page turns them into letters. Learn teaches you the code. Chat lets you talk to friends with it.</p>
-        </section>
-
-        <section>
-          <h2>The key</h2>
-          <ol>
-            <li><b>Tap for a dot.</b> <span class="pat sm" data-pat="."></span> A quick press is a dot.</li>
-            <li><b>Hold for a dash.</b> <span class="pat sm" data-pat="-"></span> While you hold, the label on the key says DOT. When you have held long enough it changes to DASH. Let go when it shows the one you want.</li>
-            <li><b>Pause to lock in a letter.</b> Stop for about half a second after your last press. The letter appears on screen and in the big letter beside the key.</li>
-            <li><b>Pause longer for a space.</b> Wait about a second and a space is added between words.</li>
-            <li><b>Listen and watch.</b> Every press plays a beep and lights the green TX lamp. Incoming sound lights the amber RX lamp.</li>
-          </ol>
-          <div class="tl" aria-hidden="true"><i style="width:14px"></i><i class="gap" style="width:14px"></i><i style="width:42px"></i><span>A = dot, dash</span></div>
-          <p><small>A dash is held about three times as long as a dot. On a computer you can hold the space bar instead of clicking the key.</small></p>
-          <p><b>Speed.</b> SLOW, MID and FAST sit beside the key. They set how long you hold for a dash and how long the pauses are. Start on SLOW and move up when it feels easy. The sound button turns the beeps on or off.</p>
-        </section>
-
-        <section>
-          <h2>Learn</h2>
-          <p><b>Free key</b> is for exploring. Key any letter and watch the chart: the path you took glows green and the spot you are on glows orange. Your letters collect on the green screen. Tap a letter on the chart to see its pattern and hear it.</p>
-          <p><b>Reading the chart.</b> Start at the funnel. A dot goes left and a dash goes right. A dot then a dash lands on A.</p>
-          <p><b>Train</b> gives you one letter at a time.</p>
-          <ol>
-            <li>Pick a level. Each level adds new letters.</li>
-            <li>Key the big letter or word shown on screen. For a word, key one letter at a time and pause between letters. Each correct letter turns green.</li>
-            <li>If you are right, the letter turns green and the next one appears. If you are wrong, you see what you keyed next to the right pattern.</li>
-            <li>Press Listen to hear the letter. Press Show hint to see its dots and dashes. After two misses the hint opens by itself.</li>
-            <li>A letter counts as learned after three correct answers, a word or phrase after two. Progress is saved on this device.</li>
-          </ol>
-          <div class="tbl">
-            <div><span class="n">Level 1</span><span class="d">E T I A N M</span></div>
-            <div><span class="n">Level 2</span><span class="d">S U R W D K G O</span></div>
-            <div><span class="n">Level 3</span><span class="d">H V F L P J B X C Y Z Q</span></div>
-            <div><span class="n">Level 4</span><span class="d">0 1 2 3 4 5 6 7 8 9</span></div>
-            <div><span class="n">Words 1</span><span class="d">Short words such as EAT, MAN and SUN</span></div>
-            <div><span class="n">Words 2</span><span class="d">Longer words such as HELLO, MORSE and FRIEND</span></div>
-            <div><span class="n">Phrases</span><span class="d">SOS, THANK YOU, HOW ARE YOU and more</span></div>
-          </div>
-        </section>
-
-        <section>
-          <h2>Chat</h2>
-          <ol>
-            <li>Open the Chat tab. Type your name and a room code, or press New room to get a code.</li>
-            <li>Press Join. The status shows LIVE when you are connected.</li>
-            <li>Give the room code to your friends. They open this same page, enter the same code and press Join. Their names appear under the room code.</li>
-            <li>Choose <b>Audio</b> or <b>Text</b> at the top of the room.</li>
-          </ol>
-          <p><b>Audio.</b> Hold the key to talk. Your friends hear each beep the moment you press it, just like a telegraph. Their beeps play on your device the same way, and the line under the switch shows who is keying. Everyone needs the page open and sound on. Each friend has their own pitch, so you can tell voices apart.</p>
-          <p><b>Text.</b> Key a message and the letters appear on the green screen. To send, key AR (<span class="pat sm" data-pat=".-.-."></span>) or press Send. To erase the last letter, key eight dots or press Erase. Each message is sent as recorded audio. Friends see it as a strip of dots and dashes, and it plays as beeps when it arrives. Press PLAY to hear it again. Press TEXT to read the message as letters, and HIDE to put it away. A dot beside Text means a new message arrived while you were in Audio.</p>
-          <p><b>Who can chat.</b> Anyone with the site link and the same room code. Room codes are not secret, so pick one that is hard to guess when you want a private chat.</p>
-          <p><small>Audio and messages are live only. Friends get what is sent while they are in the room, and nothing is stored. If the status shows LOCAL, there is no live connection and messages stay on this device.</small></p>
-        </section>
-
-        <section>
-          <h2>Cheat sheet</h2>
-          <div class="codes" id="codes"></div>
-        </section>
-
-        <section>
-          <h2>Special signals</h2>
-          <div class="tbl">
-            <div><span class="n">AR</span><span class="d">Send the message in Chat<span class="pat sm" data-pat=".-.-."></span></span></div>
-            <div><span class="n">ERR</span><span class="d">Erase the last letter in Chat<span class="pat sm" data-pat="........"></span></span></div>
-            <div><span class="n">.</span><span class="d">Full stop<span class="pat sm" data-pat=".-.-.-"></span></span></div>
-            <div><span class="n">,</span><span class="d">Comma<span class="pat sm" data-pat="--..--"></span></span></div>
-            <div><span class="n">?</span><span class="d">Question mark<span class="pat sm" data-pat="..--.."></span></span></div>
-            <div><span class="n">!</span><span class="d">Exclamation mark<span class="pat sm" data-pat="-.-.--"></span></span></div>
-            <div><span class="n">/</span><span class="d">Slash<span class="pat sm" data-pat="-..-."></span></span></div>
-          </div>
-        </section>
-
-        <section>
-          <h2>If something is off</h2>
-          <ul>
-            <li><b>No sound.</b> Check that Sound is on and your phone is not on silent. Tap the key once so the browser allows audio.</li>
-            <li><b>Dashes come out as dots.</b> Hold a little longer, or switch to SLOW.</li>
-            <li><b>Letters split in two.</b> You paused too long in the middle. Keep going at an even pace, or switch to SLOW for longer gaps.</li>
-            <li><b>A question mark appears.</b> The pattern does not match a letter. Wait for it to lock in and try again.</li>
-            <li><b>Chat says LOCAL.</b> The live connection did not open. Check your internet connection, then leave the room and join again.</li>
-          </ul>
-        </section>
-
-        <section>
-          <h2>Tips</h2>
-          <ul>
-            <li><b>Think in rhythm.</b> Morse code has a musical rhythm. Think of A (·−) as "di-dah", not "dot dash". Your taps will flow naturally.</li>
-            <li><b>Sound is essential.</b> Always use the audio. Professional operators read Morse by ear, not by eye. Keep the volume up and let the beeps guide you.</li>
-            <li>Learn the sound of each letter, not the count of dots and dashes. Use Listen often.</li>
-            <li>Five short sessions a day work better than one long one.</li>
-            <li>Finish a level before you start the next. Chat is easier once the first two levels feel natural.</li>
-          </ul>
-        </section>
-      </div>
-    </section>
-  </main>
-
-  <footer class="dock" id="dock">
-    <div class="sig">
-      <div class="lamps">
-        <span class="lamp"><i class="led" id="ledTx"></i>TX</span>
-        <span class="lamp"><i class="led rx" id="ledRx"></i>RX</span>
-      </div>
-      <div class="live" id="live" aria-live="polite">·</div>
-      <div class="sym" id="sym"></div>
-    </div>
-    <button class="key" id="key" type="button" aria-label="Morse key. Tap for a dot, hold for a dash."><span id="keyLabel">KEY</span></button>
-    <div class="ctl">
-      <div class="seg" id="speed" role="group" aria-label="Speed">
-        <button type="button" data-speed="slow">Slow</button>
-        <button type="button" data-speed="mid">Mid</button>
-        <button type="button" data-speed="fast">Fast</button>
-      </div>
-      <button class="btn small" id="soundBtn" type="button" aria-pressed="true">Sound on</button>
-    </div>
-  </footer>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="config.js"></script>
-<script src="supabase-room.js"></script>
-<script>
-(function(){
-'use strict';
-var $=function(s,r){return (r||document).querySelector(s)};
-var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
-var store={
-  get:function(k,d){try{var v=localStorage.getItem('mk.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
-  set:function(k,v){try{localStorage.setItem('mk.'+k,JSON.stringify(v))}catch(e){}}
-};
-
-/* ---------- code tables ---------- */
-var MORSE={A:'.-',B:'-...',C:'-.-.',D:'-..',E:'.',F:'..-.',G:'--.',H:'....',I:'..',J:'.---',K:'-.-',L:'.-..',M:'--',N:'-.',O:'---',P:'.--.',Q:'--.-',R:'.-.',S:'...',T:'-',U:'..-',V:'...-',W:'.--',X:'-..-',Y:'-.--',Z:'--..',
- '0':'-----','1':'.----','2':'..---','3':'...--','4':'....-','5':'.....','6':'-....','7':'--...','8':'---..','9':'----.',
- '.':'.-.-.-',',':'--..--','?':'..--..','!':'-.-.--','/':'-..-.'};
-var REV={};Object.keys(MORSE).forEach(function(k){REV[MORSE[k]]=k});
-var PRO={'.-.-.':'AR','........':'ERR'};
-function decode(code){
-  if(PRO[code]) return {kind:'pro',name:PRO[code]};
-  if(REV[code]) return {kind:'char',ch:REV[code]};
-  return {kind:'none'};
-}
-function pads(code,cls){
-  var s=document.createElement('span');s.className='pat'+(cls?' '+cls:'');
-  for(var i=0;i<code.length;i++){var p=document.createElement('span');p.className='pad '+(code[i]==='.'?'dot':'dash');s.appendChild(p)}
-  return s;
-}
-
-/* ---------- settings ---------- */
-var UNITS={slow:230,mid:160,fast:110};
-var S={speed:store.get('speed','slow'),sound:store.get('sound',true),auto:store.get('auto',true)};
-if(!UNITS[S.speed]) S.speed='slow';
-function unit(){return UNITS[S.speed]}
-function thr(){return 2*unit()}
-
-/* ---------- audio ---------- */
-var ac=null;
-function ctx(){
-  if(!ac){var C=window.AudioContext||window.webkitAudioContext;if(C){try{ac=new C()}catch(e){ac=null}}}
-  if(ac&&ac.state==='suspended'){try{ac.resume()}catch(e){}}
-  return ac;
-}
-function voice(freq,vol){
-  var o=null,g=null;
-  return {
-    on:function(){
-      if(!S.sound||o) return;
-      var a=ctx();if(!a) return;
-      o=a.createOscillator();g=a.createGain();o.type='sine';o.frequency.value=freq;
-      var t=a.currentTime;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+0.008);
-      o.connect(g);g.connect(a.destination);o.start(t);
-    },
-    off:function(){
-      if(!o) return;
-      try{var t=ac.currentTime;g.gain.cancelScheduledValues(t);g.gain.setValueAtTime(Math.max(g.gain.value,0.0001),t);g.gain.exponentialRampToValueAtTime(0.0001,t+0.015);o.stop(t+0.03)}catch(e){}
-      o=null;g=null;
-    }
-  };
-}
-var txVoice=voice(640,0.2), rxVoice=voice(500,0.16);
-
-function lampTx(on){$('#ledTx').classList.toggle('on',on)}
-function lampRx(on){$('#ledRx').classList.toggle('on',on)}
-
-var playGen=0;
-var rxQueue=[],rxBusy=false;
-function sleep(ms){return new Promise(function(r){setTimeout(r,ms)})}
-function stopPlayback(){playGen++;rxQueue.length=0;rxVoice.off();lampRx(false)}
-async function playText(text){
-  var my=++playGen,u=unit();
-  var alive=function(){return my===playGen};
-  var words=String(text).toUpperCase().split(/\s+/).filter(Boolean);
-  for(var w=0;w<words.length;w++){
-    for(var c=0;c<words[w].length;c++){
-      var code=MORSE[words[w][c]];if(!code) continue;
-      for(var s=0;s<code.length;s++){
-        lampRx(true);rxVoice.on();
-        await sleep(code[s]==='.'?u:3*u);if(!alive()) return;
-        rxVoice.off();lampRx(false);
-        await sleep(u);if(!alive()) return;
+      /* ---------- code tables ---------- */
+      var MORSE = {
+        A: '.-', B: '-...', C: '-.-.', D: '-..', E: '.', F: '..-.', G: '--.', H: '....', I: '..', J: '.---', K: '-.-', L: '.-..', M: '--', N: '-.', O: '---', P: '.--.', Q: '--.-', R: '.-.', S: '...', T: '-', U: '..-', V: '...-', W: '.--', X: '-..-', Y: '-.--', Z: '--..',
+        '0': '-----', '1': '.----', '2': '..---', '3': '...--', '4': '....-', '5': '.....', '6': '-....', '7': '--...', '8': '---..', '9': '----.',
+        '.': '.-.-.-', ',': '--..--', '?': '..--..', '!': '-.-.--', '/': '-..-.'
+      };
+      var REV = {}; Object.keys(MORSE).forEach(function (k) { REV[MORSE[k]] = k });
+      var PRO = { '.-.-.': 'AR', '........': 'ERR' };
+      function decode(code) {
+        if (PRO[code]) return { kind: 'pro', name: PRO[code] };
+        if (REV[code]) return { kind: 'char', ch: REV[code] };
+        return { kind: 'none' };
       }
-      await sleep(2*u);if(!alive()) return;
-    }
-    await sleep(4*u);if(!alive()) return;
-  }
-}
-async function pump(){
-  if(rxBusy) return;rxBusy=true;
-  while(rxQueue.length){var t=rxQueue.shift();await playText(t)}
-  rxBusy=false;
-}
-function queuePlay(t){rxQueue.push(t);pump()}
-
-/* ---------- chart ---------- */
-var TREE={'.':'E','-':'T','..':'I','.-':'A','-.':'N','--':'M','...':'S','..-':'U','.-.':'R','.--':'W','-..':'D','-.-':'K','--.':'G','---':'O',
- '....':'H','...-':'V','..-.':'F','.-..':'L','.--.':'P','.---':'J','-...':'B','-..-':'X','-.-.':'C','-.--':'Y','--..':'Z','--.-':'Q'};
-var NS='http://www.w3.org/2000/svg';
-function se(n,a,p){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e}
-var GAP=21,PADX=8,TOP=22,DY=42,DEPTH=4;
-function pos(code){
-  var d=code.length,bits=code.replace(/\./g,'0').replace(/-/g,'1'),span=Math.pow(2,DEPTH-d),start=(bits?parseInt(bits,2):0)*span;
-  return {x:PADX+(start+span/2)*GAP,y:TOP+d*DY};
-}
-var nodes={},edges={},rootEl=null;
-(function buildTree(){
-  var svg=$('#tree');
-  var gE=se('g',{},svg),gM=se('g',{},svg),gN=se('g',{},svg);
-  var codes=Object.keys(TREE);
-  codes.forEach(function(c){
-    var p=pos(c),q=pos(c.slice(0,-1));
-    edges[c]=se('line',{class:'edge',x1:q.x,y1:q.y,x2:p.x,y2:p.y},gE);
-    var mx=(p.x+q.x)/2,my=(p.y+q.y)/2,ang=Math.atan2(p.y-q.y,p.x-q.x)*180/Math.PI;
-    if(c[c.length-1]==='.') se('circle',{class:'mk',cx:mx,cy:my,r:2.8},gM);
-    else se('rect',{class:'mk',x:-4.5,y:-1.8,width:9,height:3.6,rx:1,transform:'translate('+mx+' '+my+') rotate('+ang+')'},gM);
-  });
-  codes.forEach(function(c){
-    var p=pos(c),g=se('g',{class:'node','data-code':c},gN);
-    se('circle',{cx:p.x,cy:p.y,r:9.5},g);
-    var t=se('text',{x:p.x,y:p.y+.5},g);t.textContent=TREE[c];
-    nodes[c]=g;
-    g.addEventListener('click',function(){onNodeTap(c)});
-  });
-  var r=pos('');
-  rootEl=se('g',{class:'root'},svg);
-  se('polygon',{points:(r.x-9)+','+(r.y-12)+' '+(r.x+9)+','+(r.y-12)+' '+(r.x+2.5)+','+(r.y-1)+' '+(r.x+2.5)+','+(r.y+6)+' '+(r.x-2.5)+','+(r.y+9)+' '+(r.x-2.5)+','+(r.y-1)},rootEl);
-})();
-function lightTree(code){
-  rootEl.classList.toggle('on',code.length>0);
-  Object.keys(nodes).forEach(function(c){nodes[c].classList.remove('on','cur');edges[c].classList.remove('on')});
-  for(var i=1;i<=code.length;i++){
-    var p=code.slice(0,i),n=nodes[p];if(!n) break;
-    edges[p].classList.add('on');n.classList.add(i===code.length?'cur':'on');
-  }
-}
-function flashNode(code,cls){
-  var n=nodes[code];if(!n) return;
-  n.classList.remove('hit','miss');n.classList.add(cls);
-  setTimeout(function(){n.classList.remove(cls)},900);
-}
-
-/* ---------- decoder ---------- */
-var D={code:'',down:false,t0:0,tDash:null,tLetter:null,tWord:null,tx:false};
-var view='learn',started=false;
-var keyEl=$('#key'),keyLabel=$('#keyLabel'),liveEl=$('#live'),symEl=$('#sym');
-var liveLock=false,liveT=null;
-function clearTimers(){clearTimeout(D.tDash);clearTimeout(D.tLetter);clearTimeout(D.tWord)}
-function renderSignal(){
-  symEl.replaceChildren(D.code?pads(D.code,'sm lit'):'');
-  if(liveLock) return;
-  var r=D.code?decode(D.code):null;
-  if(r&&r.kind==='char'){liveEl.textContent=r.ch;liveEl.className='live guess'}
-  else if(r&&r.kind==='pro'){liveEl.textContent=r.name;liveEl.className='live guess'}
-  else{liveEl.textContent=D.code?'?':'·';liveEl.className='live'}
-}
-function flashLive(txt,cls){
-  liveLock=true;liveEl.textContent=txt;liveEl.className='live '+cls;
-  clearTimeout(liveT);liveT=setTimeout(function(){liveLock=false;renderSignal()},900);
-}
-function keying(on){
-  if(!chat.room) return;
-  try{chat.room.presence({k:on?1:0}).catch(function(){})}catch(e){}
-  if(chat.mode!=='audio') return;
-  if(on&&view!=='chat') return;
-  if(!on&&!D.tx) return;
-  D.tx=on;
-  try{chat.room.emit('key',{d:on?1:0}).catch(function(){})}catch(e){}
-}
-function keyDown(){
-  if(view==='guide'||D.down) return;
-  D.down=true;D.t0=performance.now();clearTimers();
-  liveLock=false;clearTimeout(liveT);
-  ctx();txVoice.on();lampTx(true);keyEl.classList.add('down');
-  try{if(navigator.vibrate) navigator.vibrate(8)}catch(e){}
-  keyLabel.textContent='DOT';
-  D.tDash=setTimeout(function(){if(D.down) keyLabel.textContent='DASH'},thr());
-  renderSignal();
-  if(view==='chat') keying(true);
-}
-function keyUp(){
-  if(!D.down) return;
-  D.down=false;clearTimeout(D.tDash);
-  var held=performance.now()-D.t0;
-  txVoice.off();lampTx(false);keyEl.classList.remove('down');keyLabel.textContent='KEY';
-  keying(false);
-  D.code+=held>=thr()?'-':'.';
-  renderSignal();lightTree(D.code);
-  if(D.code.length>=9){commit();return}
-  D.tLetter=setTimeout(commit,3.5*unit());
-}
-function commit(){
-  var code=D.code;D.code='';
-  var res=decode(code);
-  lightTree('');
-  if(res.kind==='char'){flashNode(code,'hit');flashLive(res.ch,'ok')}
-  else if(res.kind==='pro'){flashLive(res.name,'ok')}
-  else flashLive('?','bad');
-  renderSignal();
-  handler().token(res,code);
-  D.tWord=setTimeout(function(){handler().gap()},3.5*unit());
-}
-function resetDecoder(){
-  clearTimers();
-  if(D.down){D.down=false;txVoice.off();lampTx(false);keyEl.classList.remove('down');keyLabel.textContent='KEY';keying(false)}
-  D.code='';liveLock=false;clearTimeout(liveT);renderSignal();lightTree('');
-}
-keyEl.addEventListener('pointerdown',function(e){
-  e.preventDefault();
-  try{keyEl.setPointerCapture(e.pointerId)}catch(_){}
-  keyDown();
-});
-['pointerup','pointercancel','lostpointercapture'].forEach(function(t){keyEl.addEventListener(t,keyUp)});
-keyEl.addEventListener('contextmenu',function(e){e.preventDefault()});
-window.addEventListener('keydown',function(e){
-  if(e.code!=='Space'||e.repeat) return;
-  var t=e.target,tag=t&&t.tagName;
-  if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT'||(t&&t.isContentEditable)) return;
-  if(tag==='BUTTON'&&t!==keyEl) return;
-  e.preventDefault();keyDown();
-});
-window.addEventListener('keyup',function(e){if(e.code==='Space') keyUp()});
-window.addEventListener('blur',keyUp);
-
-/* ---------- learn ---------- */
-var LEVELS=[
-  {name:'Lv 1',items:'ETIANM'.split('')},
-  {name:'Lv 2',items:'SURWDKGO'.split('')},
-  {name:'Lv 3',items:'HVFLPJBXCYZQ'.split('')},
-  {name:'Lv 4',items:'0123456789'.split('')},
-  {name:'Words 1',items:['EAT','TEA','TEN','NET','MAN','MEN','TIN','AIM','SUN','RUN','SIT','OUR','DOG','SEA','MOM','DAD']},
-  {name:'Words 2',items:['HELLO','MORSE','CODE','DASH','BEEP','HELP','GOOD','PLAY','RADIO','HAPPY','WATER','FRIEND','SIGNAL','THANKS']},
-  {name:'Phrases',items:['SOS','HELLO WORLD','GOOD MORNING','THANK YOU','SEE YOU SOON','I AM FINE','HOW ARE YOU','MORSE CODE','CALL ME']}
-];
-var L={mode:store.get('lmode','explore'),level:store.get('level',0),score:store.get('score',{}),target:null,pos:0,hint:false,wrong:0,lw:0,locked:false,state:'',text:''};
-if(L.mode!=='train'&&L.mode!=='explore') L.mode='explore';
-if(!(L.level>=0&&L.level<LEVELS.length)) L.level=0;
-var tmsgEl=$('#tmsg'),targetEl=$('#target');
-function need(item){return item.length>1?2:3}
-function seqOf(t){return t.replace(/ /g,'')}
-function learned(items){var n=0;items.forEach(function(it){if((L.score[it]||0)>=need(it)) n++});return n}
-
-function renderText(el,txt,ph){
-  el.replaceChildren();
-  if(!txt){var s=document.createElement('span');s.className='ph';s.textContent=ph;el.appendChild(s)}
-  else el.appendChild(document.createTextNode(txt));
-  var c=document.createElement('span');c.className='caret';el.appendChild(c);
-}
-function setExplore(ch,code,cap){
-  $('#xLetter').textContent=ch;
-  $('#xPat').replaceChildren(code?pads(code):'');
-  $('#xCap').textContent=cap;
-}
-function renderExplore(){renderText($('#xText'),L.text,'Your letters appear here')}
-function renderLearnMode(){
-  $$('#lmode button').forEach(function(b){b.classList.toggle('active',b.dataset.m===L.mode)});
-  $('#p-explore').hidden=L.mode!=='explore';
-  $('#p-train').hidden=L.mode!=='train';
-  if(L.mode==='train'){
-    if(!L.target||LEVELS[L.level].items.indexOf(L.target)<0){L.target=pickTarget();L.pos=0}
-    renderTrain();
-  }else renderExplore();
-}
-function pickTarget(){
-  var items=LEVELS[L.level].items,pool=[];
-  items.forEach(function(it){var w=(L.score[it]||0)>=need(it)?1:4;for(var j=0;j<w;j++) pool.push(it)});
-  var t,n=0;
-  do{t=pool[Math.floor(Math.random()*pool.length)];n++}while(t===L.target&&n<12);
-  return t;
-}
-function renderTarget(){
-  var t=L.target,el=targetEl;
-  el.className='target'+(t.length>1?' word':'')+(L.state?' '+L.state:'');
-  if(t.length===1){el.textContent=t;return}
-  el.replaceChildren();
-  var idx=0;
-  for(var i=0;i<t.length;i++){
-    var s=document.createElement('span');
-    if(t[i]===' '){s.textContent=' '}
-    else{
-      s.textContent=t[i];
-      if(idx<L.pos) s.className='d';
-      else if(idx===L.pos&&L.state!=='ok') s.className='c';
-      idx++;
-    }
-    el.appendChild(s);
-  }
-}
-function renderTrain(){
-  var items=LEVELS[L.level].items;
-  $$('#levels button').forEach(function(b,i){b.classList.toggle('active',i===L.level)});
-  var chips=items.map(function(it){
-    var s=document.createElement('span');s.className='chip'+(it===L.target?' cur':'');
-    var d=document.createElement('i');d.className='led'+((L.score[it]||0)>=need(it)?' on':'');
-    s.appendChild(d);s.appendChild(document.createTextNode(it));return s;
-  });
-  $('#chips').replaceChildren.apply($('#chips'),chips);
-  renderTarget();
-  var hr=$('#hintRow');hr.replaceChildren();
-  var exp=seqOf(L.target)[L.pos];
-  if(L.hint&&exp){
-    hr.appendChild(pads(MORSE[exp]));
-    if(L.target.length>1){var lb=document.createElement('span');lb.style.marginLeft='10px';lb.textContent='next letter';hr.appendChild(lb)}
-  }else hr.textContent='Hint hidden';
-  $('#tHint').textContent=L.hint?'Hide hint':'Show hint';
-  $('#tProg').textContent=learned(items)+' of '+items.length+(items[0].length>1?' words learned':' letters learned');
-}
-function newTarget(){
-  L.locked=false;L.state='';L.pos=0;L.lw=0;L.wrong=0;L.hint=false;L.target=pickTarget();
-}
-var resetArmed=false,resetT=null;
-(function initLearn(){
-  var lv=$('#levels');
-  LEVELS.forEach(function(l,i){
-    var b=document.createElement('button');b.type='button';b.textContent=l.name;
-    b.addEventListener('click',function(){L.level=i;store.set('level',i);L.target=null;newTarget();tmsgEl.textContent='';renderTrain()});
-    lv.appendChild(b);
-  });
-  $$('#lmode button').forEach(function(b){b.addEventListener('click',function(){
-    L.mode=b.dataset.m;store.set('lmode',L.mode);resetDecoder();stopPlayback();renderLearnMode();
-  })});
-  $('#xListen').addEventListener('click',function(){var ch=$('#xLetter').textContent;if(MORSE[ch]){stopPlayback();playText(ch)}});
-  $('#xClear').addEventListener('click',function(){L.text='';renderExplore()});
-  $('#tListen').addEventListener('click',function(){stopPlayback();playText(L.target)});
-  $('#tHint').addEventListener('click',function(){L.hint=!L.hint;renderTrain()});
-  $('#tReset').addEventListener('click',function(){
-    var b=$('#tReset');
-    if(!resetArmed){resetArmed=true;b.textContent='Tap again to confirm';resetT=setTimeout(function(){resetArmed=false;b.textContent='Reset progress'},3000);return}
-    clearTimeout(resetT);resetArmed=false;b.textContent='Reset progress';
-    L.score={};store.set('score',L.score);L.pos=0;L.hint=false;L.wrong=0;L.lw=0;L.state='';tmsgEl.textContent='Progress cleared.';renderTrain();
-  });
-  setExplore('S','...','Example. Tap the key three times to spell S.');
-})();
-function onNodeTap(code){
-  if(view!=='learn'||L.mode!=='explore') return;
-  var ch=TREE[code];setExplore(ch,code,'From the chart. Listen, then try it on the key.');
-  stopPlayback();playText(ch);
-}
-var learnHandler={
-  token:function(res,code){
-    if(L.mode==='explore'){
-      if(res.kind==='char'){
-        L.text=(L.text+res.ch).slice(-80);setExplore(res.ch,code,'You keyed');
-      }else if(res.kind==='pro'){
-        if(res.name==='ERR') L.text=L.text.slice(0,-1);
-        setExplore(res.name,code,res.name==='AR'?'AR means end of message':'ERR means erase');
-      }else setExplore('?',code,'No letter has that pattern. Try again.');
-      renderExplore();return;
-    }
-    if(L.locked) return;
-    var ch=res.kind==='char'?res.ch:null;
-    var seq=seqOf(L.target),exp=seq[L.pos],isWord=seq.length>1;
-    if(ch===exp){
-      L.pos++;L.lw=0;L.hint=false;
-      if(L.pos>=seq.length){
-        L.score[L.target]=(L.score[L.target]||0)+1;store.set('score',L.score);
-        L.locked=true;L.state='ok';
-        var items=LEVELS[L.level].items;
-        tmsgEl.textContent=learned(items)===items.length?'Level complete. Try the next level.':(isWord?'Word complete.':'Correct.');
-        renderTrain();
-        setTimeout(function(){newTarget();if(L.mode==='train'){tmsgEl.textContent='';renderTrain()}},isWord?1300:950);
-      }else{
-        tmsgEl.textContent='';renderTrain();
+      function pads(code, cls) {
+        var s = document.createElement('span'); s.className = 'pat' + (cls ? ' ' + cls : '');
+        for (var i = 0; i < code.length; i++) { var p = document.createElement('span'); p.className = 'pad ' + (code[i] === '.' ? 'dot' : 'dash'); s.appendChild(p) }
+        return s;
       }
-    }else{
-      L.wrong++;L.lw++;L.state='bad';
-      var got=res.kind==='char'?res.ch:(res.kind==='pro'?res.name:'?');
-      tmsgEl.textContent='You keyed '+got+'. '+(isWord?'Next letter '+exp:exp)+' is '+MORSE[exp].replace(/\./g,'·').replace(/-/g,'−')+'.';
-      if(L.lw>=2) L.hint=true;
-      renderTrain();
-      setTimeout(function(){if(L.state==='bad'){L.state='';if(L.mode==='train') renderTrain()}},700);
-    }
-  },
-  gap:function(){
-    if(L.mode==='explore'&&L.text&&L.text.slice(-1)!==' '){L.text+=' ';renderExplore()}
-  }
-};
 
-/* ---------- chat ---------- */
-var COLORS=['#38f05f','#ff8a2b','#5ec8ff','#ff6fd0','#ffd84a','#b69bff'];
-var chat={joined:false,room:null,name:store.get('nick',''),code:store.get('room',''),color:store.get('col',null),mode:store.get('cmode','audio'),draft:'',unsubs:[],live:false,names:{},unread:false};
-if(chat.mode!=='audio'&&chat.mode!=='text') chat.mode='audio';
-if(!(chat.color>=0&&chat.color<COLORS.length)){chat.color=Math.floor(Math.random()*COLORS.length);store.set('col',chat.color)}
-var roomP=(window.claude&&window.claude.use)?window.claude.use('room').catch(function(){return null}):Promise.resolve(null);
-var WORDS=['dot','dash','beep','tick','wave','spark','relay','echo','pulse','signal'];
-function cleanName(s){return String(s).replace(/[^\w .-]/g,'').trim().slice(0,14)}
-function cleanRoom(s){return String(s).toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9_.-]/g,'').replace(/^[^a-z0-9]+/,'').slice(0,32)}
-function cleanText(s){return String(s).toUpperCase().replace(/[^A-Z0-9 .,?!\/]/g,'').replace(/\s+/g,' ').trim().slice(0,200)}
-var logEl=$('#log'),peersEl=$('#peers');
+      /* ---------- settings ---------- */
+      var UNITS = { slow: 230, mid: 160, fast: 110 };
+      var S = { speed: store.get('speed', 'slow'), sound: store.get('sound', true), auto: store.get('auto', true) };
+      if (!UNITS[S.speed]) S.speed = 'slow';
+      function unit() { return UNITS[S.speed] }
+      function thr() { return 2 * unit() }
 
-/* live audio from friends: one tone per person while their key is down */
-var peerVoices={};
-function peerFreq(peer){var h=0;for(var i=0;i<peer.length;i++) h=(h*31+peer.charCodeAt(i))>>>0;return 420+(h%7)*40}
-function updateHeard(){
-  var names=[];
-  Object.keys(peerVoices).forEach(function(k){if(peerVoices[k].on) names.push(chat.names[k]||'Friend')});
-  lampRx(names.length>0);
-  var h=$('#heard');
-  if(!chat.room){h.textContent='No live connection';h.className='heard'}
-  else if(names.length){h.textContent=names.join(', ')+' keying';h.className='heard on'}
-  else{h.textContent='Quiet';h.className='heard'}
-}
-function rxStop(peer){
-  var p=peerVoices[peer];if(!p) return;
-  clearTimeout(p.t);p.v.off();p.on=false;updateHeard();
-}
-function stopAllRx(){Object.keys(peerVoices).forEach(rxStop)}
-function rxKey(msg){
-  if(msg.isMe||view!=='chat'||chat.mode!=='audio') return;
-  var d=msg.data;if(!d||typeof d!=='object') return;
-  var peer=String(msg.peer),p=peerVoices[peer];
-  if(!p) p=peerVoices[peer]={v:voice(peerFreq(peer),0.14),on:false,t:null};
-  clearTimeout(p.t);
-  if(d.d===1){
-    p.v.on();p.on=true;
-    p.t=setTimeout(function(){rxStop(peer)},2500);
-    updateHeard();
-  }else rxStop(peer);
-}
+      /* ---------- audio ---------- */
+      var ac = null;
+      function ctx() {
+        if (!ac) { var C = window.AudioContext || window.webkitAudioContext; if (C) { try { ac = new C() } catch (e) { ac = null } } }
+        if (ac && ac.state === 'suspended') { try { ac.resume() } catch (e) { } }
+        return ac;
+      }
+      function voice(freq, vol) {
+        var o = null, g = null;
+        return {
+          on: function () {
+            if (!S.sound || o) return;
+            var a = ctx(); if (!a) return;
+            o = a.createOscillator(); g = a.createGain(); o.type = 'sine'; o.frequency.value = freq;
+            var t = a.currentTime; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.008);
+            o.connect(g); g.connect(a.destination); o.start(t);
+          },
+          off: function () {
+            if (!o) return;
+            try { var t = ac.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(Math.max(g.gain.value, 0.0001), t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.015); o.stop(t + 0.03) } catch (e) { }
+            o = null; g = null;
+          }
+        };
+      }
+      var txVoice = voice(640, 0.2), rxVoice = voice(500, 0.16);
 
-function renderDraft(){renderText($('#draft'),chat.draft,'Key a message')}
-function renderChatMode(){
-  $$('#cmode button').forEach(function(b){
-    b.classList.toggle('active',b.dataset.m===chat.mode);
-    if(b.dataset.m==='text') b.textContent=chat.unread?'Text •':'Text';
-  });
-  $('#audioPane').hidden=chat.mode!=='audio';
-  $('#textPane').hidden=chat.mode!=='text';
-}
-function renderChat(){
-  $('#join').hidden=chat.joined;$('#room').hidden=!chat.joined;
-  if(!chat.joined){$('#nick').value=chat.name;$('#roomCode').value=chat.code}
-  else{renderChatMode();renderDraft();updateHeard();logEl.scrollTop=logEl.scrollHeight}
-  $('#autoBtn').textContent=S.auto?'Auto-play on':'Auto-play off';
-  $('#autoBtn').setAttribute('aria-pressed',String(S.auto));
-}
-function setStatus(live,text){
-  chat.live=live;$('#status').classList.toggle('up',live);
-  $('#status .led').classList.toggle('on',live);$('#statusText').textContent=text;
-}
-function emptyLog(){
-  logEl.replaceChildren();
-  var d=document.createElement('div');d.className='empty';d.id='logEmpty';
-  d.textContent='No messages yet. Key a message and send it with AR.';logEl.appendChild(d);
-}
-function addMsg(m,me){
-  var e=$('#logEmpty');if(e) e.remove();
-  var d=document.createElement('div');d.className='m'+(me?' me':'');
-  var w=document.createElement('div');w.className='who';
-  var i=document.createElement('i');i.className='dotc';i.style.background=COLORS[m.c];
-  w.appendChild(i);w.appendChild(document.createTextNode(me?m.n+' (you)':m.n));
-  var wave=document.createElement('div');wave.className='wave';wave.setAttribute('aria-hidden','true');
-  var cnt=0;
-  m.t.split('').forEach(function(ch){
-    if(cnt>60) return;
-    if(ch===' '){var g=document.createElement('i');g.className='wg';wave.appendChild(g);return}
-    var c=MORSE[ch];if(!c) return;
-    var lt=pads(c,'sm');lt.classList.add('lt');wave.appendChild(lt);cnt+=c.length;
-  });
-  var acts=document.createElement('div');acts.className='acts';
-  var pb=document.createElement('button');pb.type='button';pb.className='play go';pb.textContent='PLAY';
-  pb.setAttribute('aria-label','Play message as Morse');
-  pb.addEventListener('click',function(){stopPlayback();playText(m.t)});
-  var t=document.createElement('div');t.className='txt';t.textContent=m.t;t.hidden=true;
-  var tb=document.createElement('button');tb.type='button';tb.className='play';tb.textContent='TEXT';
-  tb.setAttribute('aria-expanded','false');
-  tb.addEventListener('click',function(){
-    t.hidden=!t.hidden;tb.textContent=t.hidden?'TEXT':'HIDE';tb.setAttribute('aria-expanded',String(!t.hidden));
-    logEl.scrollTop=Math.min(logEl.scrollTop,logEl.scrollHeight);
-  });
-  acts.appendChild(pb);acts.appendChild(tb);
-  d.appendChild(w);d.appendChild(wave);d.appendChild(acts);d.appendChild(t);logEl.appendChild(d);
-  while(logEl.children.length>60) logEl.removeChild(logEl.firstChild);
-  logEl.scrollTop=logEl.scrollHeight;
-}
-function renderPeers(list){
-  var out=[];
-  chat.names={};
-  if(!list||!list.length){
-    var s=document.createElement('span');s.className='chip';var d=document.createElement('i');d.className='led';
-    s.appendChild(d);s.appendChild(document.createTextNode((chat.name||'Friend')+' (you)'));out.push(s);
-  }else list.forEach(function(p){
-    var pr=p.presence||{};
-    var nm=cleanName(String(pr.n||''))||'Friend';
-    chat.names[p.peer]=nm;
-    var s=document.createElement('span');s.className='chip';
-    var d=document.createElement('i');d.className='led'+(pr.k===1?' on':'');
-    s.appendChild(d);s.appendChild(document.createTextNode(nm+(p.isMe&&p.sameTab?' (you)':'')));out.push(s);
-  });
-  peersEl.replaceChildren.apply(peersEl,out);
-}
-function parseMsg(d){
-  if(!d||typeof d!=='object') return null;
-  var t=cleanText(d.t||'');if(!t) return null;
-  var c=(typeof d.c==='number'&&d.c>=0&&d.c<COLORS.length&&d.c%1===0)?d.c:0;
-  return {t:t,n:cleanName(String(d.n||''))||'Friend',c:c};
-}
-async function joinRoom(){
-  var name=cleanName($('#nick').value)||'Friend';
-  var code=cleanRoom($('#roomCode').value);
-  var note=$('#joinNote');
-  if(code.length<3){note.textContent='Room codes need at least 3 letters or numbers.';return}
-  ctx();
-  chat.name=name;chat.code=code;store.set('nick',name);store.set('room',code);
-  var btn=$('#joinBtn');btn.disabled=true;note.textContent='Connecting...';
-  var ns=await roomP,nr=null,err='';
-  if(ns){
-    try{nr=await ns.join(code)}catch(e){err=(e&&e.code)||'error'}
-  }
-  btn.disabled=false;note.textContent='';
-  chat.room=nr;chat.draft='';chat.joined=true;chat.unread=false;
-  $('#roomName').textContent=code;
-  emptyLog();
-  if(nr){
-    setStatus(nr.connected(),nr.connected()?'LIVE':'CONNECTING');
-    chat.unsubs=[
-      nr.on('chat',function(msg){
-        if(msg.sameTab) return;
-        var m=parseMsg(msg.data);if(!m) return;
-        addMsg(m,!!msg.isMe);
-        if(!msg.isMe){
-          if(chat.mode==='text'){if(S.auto&&m.t.length<=40) queuePlay(m.t)}
-          else{chat.unread=true;renderChatMode()}
+      function lampTx(on) { $('#ledTx').classList.toggle('on', on) }
+      function lampRx(on) { $('#ledRx').classList.toggle('on', on) }
+
+      var playGen = 0;
+      var rxQueue = [], rxBusy = false;
+      function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms) }) }
+      function stopPlayback() { playGen++; rxQueue.length = 0; rxVoice.off(); lampRx(false) }
+      async function playText(text) {
+        var my = ++playGen, u = unit();
+        var alive = function () { return my === playGen };
+        var words = String(text).toUpperCase().split(/\s+/).filter(Boolean);
+        for (var w = 0; w < words.length; w++) {
+          for (var c = 0; c < words[w].length; c++) {
+            var code = MORSE[words[w][c]]; if (!code) continue;
+            for (var s = 0; s < code.length; s++) {
+              lampRx(true); rxVoice.on();
+              await sleep(code[s] === '.' ? u : 3 * u); if (!alive()) return;
+              rxVoice.off(); lampRx(false);
+              await sleep(u); if (!alive()) return;
+            }
+            await sleep(2 * u); if (!alive()) return;
+          }
+          await sleep(4 * u); if (!alive()) return;
         }
-      },function(){setStatus(false,'OFFLINE')}),
-      nr.on('key',rxKey,function(){}),
-      nr.onPeers(function(ch){
-        renderPeers(ch.peers);
-        ch.left.forEach(function(p){rxStop(p.peer)});
-        updateHeard();
-      },function(){}),
-      nr.onConnection(function(c){setStatus(c,c?'LIVE':'CONNECTING')},function(){setStatus(false,'OFFLINE')})
-    ];
-    try{nr.presence({n:name,c:chat.color,k:0}).catch(function(){})}catch(e){}
-  }else{
-    setStatus(false,'LOCAL');renderPeers([]);
-    var d=document.createElement('div');d.className='empty';
-    d.textContent=err?'The live channel did not open ('+err+'). Messages stay on this device.':'No live connection in this view. Messages stay on this device.';
-    logEl.appendChild(d);
-  }
-  renderChat();
-}
-function leaveRoom(){
-  stopPlayback();stopAllRx();
-  chat.unsubs.forEach(function(u){try{u()}catch(e){}});chat.unsubs=[];
-  if(chat.room){try{chat.room.leave().catch(function(){})}catch(e){}}
-  chat.room=null;chat.joined=false;chat.draft='';
-  resetDecoder();renderChat();
-}
-function sendDraft(){
-  var t=cleanText(chat.draft);
-  if(!t){flashLive('?','bad');return}
-  var m={t:t,n:chat.name||'Friend',c:chat.color};
-  addMsg(m,true);
-  if(chat.room){chat.room.emit('chat',m).catch(function(){setStatus(false,'OFFLINE')})}
-  chat.draft='';renderDraft();
-}
-var chatHandler={
-  token:function(res){
-    if(!chat.joined||chat.mode!=='text') return;
-    if(res.kind==='char'){chat.draft=(chat.draft+res.ch).slice(0,200);renderDraft()}
-    else if(res.kind==='pro'){
-      if(res.name==='AR') sendDraft();
-      else{chat.draft=chat.draft.replace(/\s+$/,'').slice(0,-1);renderDraft()}
-    }
-  },
-  gap:function(){
-    if(chat.joined&&chat.mode==='text'&&chat.draft&&chat.draft.slice(-1)!==' '){chat.draft+=' ';renderDraft()}
-  }
-};
-function handler(){return view==='chat'?chatHandler:learnHandler}
-(function initChat(){
-  $('#joinBtn').addEventListener('click',joinRoom);
-  $('#newRoom').addEventListener('click',function(){
-    $('#roomCode').value=WORDS[Math.floor(Math.random()*WORDS.length)]+'-'+(100+Math.floor(Math.random()*900));
-  });
-  $('#roomCode').addEventListener('keydown',function(e){if(e.key==='Enter') joinRoom()});
-  $('#leaveBtn').addEventListener('click',leaveRoom);
-  $('#send').addEventListener('click',sendDraft);
-  $('#bk').addEventListener('click',function(){chat.draft=chat.draft.replace(/\s+$/,'').slice(0,-1);renderDraft()});
-  $('#sp').addEventListener('click',function(){if(chat.draft&&chat.draft.slice(-1)!==' '){chat.draft+=' ';renderDraft()}});
-  $('#autoBtn').addEventListener('click',function(){S.auto=!S.auto;store.set('auto',S.auto);if(!S.auto) stopPlayback();renderChat()});
-  $$('#cmode button').forEach(function(b){b.addEventListener('click',function(){
-    chat.mode=b.dataset.m;store.set('cmode',chat.mode);
-    if(chat.mode==='text') chat.unread=false;
-    resetDecoder();stopPlayback();stopAllRx();renderChatMode();updateHeard();
-  })});
-  $('#copyBtn').addEventListener('click',function(){
-    var b=$('#copyBtn'),txt=chat.code;
-    var fallback=function(){
-      var r=document.createRange();r.selectNodeContents($('#roomName'));
-      var s=window.getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Selected';
-    };
-    try{
-      navigator.clipboard.writeText(txt).then(function(){b.textContent='Copied'},fallback);
-    }catch(e){fallback()}
-    setTimeout(function(){b.textContent='Copy code'},1800);
-  });
-})();
+      }
+      async function pump() {
+        if (rxBusy) return; rxBusy = true;
+        while (rxQueue.length) { var t = rxQueue.shift(); await playText(t) }
+        rxBusy = false;
+      }
+      function queuePlay(t) { rxQueue.push(t); pump() }
 
-/* ---------- guide ---------- */
-(function initGuide(){
-  var host=$('#codes');
-  'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('').forEach(function(ch){
-    var d=document.createElement('div');d.className='code';
-    var s=document.createElement('span');s.className='ch';s.textContent=ch;
-    d.appendChild(s);d.appendChild(pads(MORSE[ch],'sm'));host.appendChild(d);
-  });
-  $$('[data-pat]').forEach(function(el){el.appendChild(pads(el.dataset.pat,'sm'))});
-})();
+      /* ---------- chart ---------- */
+      var TREE = {
+        '.': 'E', '-': 'T', '..': 'I', '.-': 'A', '-.': 'N', '--': 'M', '...': 'S', '..-': 'U', '.-.': 'R', '.--': 'W', '-..': 'D', '-.-': 'K', '--.': 'G', '---': 'O',
+        '....': 'H', '...-': 'V', '..-.': 'F', '.-..': 'L', '.--.': 'P', '.---': 'J', '-...': 'B', '-..-': 'X', '-.-.': 'C', '-.--': 'Y', '--..': 'Z', '--.-': 'Q'
+      };
+      var NS = 'http://www.w3.org/2000/svg';
+      function se(n, a, p) { var e = document.createElementNS(NS, n); for (var k in a) e.setAttribute(k, a[k]); if (p) p.appendChild(e); return e }
+      var GAP = 21, PADX = 8, TOP = 22, DY = 42, DEPTH = 4;
+      function pos(code) {
+        var d = code.length, bits = code.replace(/\./g, '0').replace(/-/g, '1'), span = Math.pow(2, DEPTH - d), start = (bits ? parseInt(bits, 2) : 0) * span;
+        return { x: PADX + (start + span / 2) * GAP, y: TOP + d * DY };
+      }
+      var nodes = {}, edges = {}, rootEl = null;
+      (function buildTree() {
+        var svg = $('#tree');
+        var gE = se('g', {}, svg), gM = se('g', {}, svg), gN = se('g', {}, svg);
+        var codes = Object.keys(TREE);
+        codes.forEach(function (c) {
+          var p = pos(c), q = pos(c.slice(0, -1));
+          edges[c] = se('line', { class: 'edge', x1: q.x, y1: q.y, x2: p.x, y2: p.y }, gE);
+          var mx = (p.x + q.x) / 2, my = (p.y + q.y) / 2, ang = Math.atan2(p.y - q.y, p.x - q.x) * 180 / Math.PI;
+          if (c[c.length - 1] === '.') se('circle', { class: 'mk', cx: mx, cy: my, r: 2.8 }, gM);
+          else se('rect', { class: 'mk', x: -4.5, y: -1.8, width: 9, height: 3.6, rx: 1, transform: 'translate(' + mx + ' ' + my + ') rotate(' + ang + ')' }, gM);
+        });
+        codes.forEach(function (c) {
+          var p = pos(c), g = se('g', { class: 'node', 'data-code': c }, gN);
+          se('circle', { cx: p.x, cy: p.y, r: 9.5 }, g);
+          var t = se('text', { x: p.x, y: p.y + .5 }, g); t.textContent = TREE[c];
+          nodes[c] = g;
+          g.addEventListener('click', function () { onNodeTap(c) });
+        });
+        var r = pos('');
+        rootEl = se('g', { class: 'root' }, svg);
+        se('polygon', { points: (r.x - 9) + ',' + (r.y - 12) + ' ' + (r.x + 9) + ',' + (r.y - 12) + ' ' + (r.x + 2.5) + ',' + (r.y - 1) + ' ' + (r.x + 2.5) + ',' + (r.y + 6) + ' ' + (r.x - 2.5) + ',' + (r.y + 9) + ' ' + (r.x - 2.5) + ',' + (r.y - 1) }, rootEl);
+      })();
+      function lightTree(code) {
+        rootEl.classList.toggle('on', code.length > 0);
+        Object.keys(nodes).forEach(function (c) { nodes[c].classList.remove('on', 'cur'); edges[c].classList.remove('on') });
+        for (var i = 1; i <= code.length; i++) {
+          var p = code.slice(0, i), n = nodes[p]; if (!n) break;
+          edges[p].classList.add('on'); n.classList.add(i === code.length ? 'cur' : 'on');
+        }
+      }
+      function flashNode(code, cls) {
+        var n = nodes[code]; if (!n) return;
+        n.classList.remove('hit', 'miss'); n.classList.add(cls);
+        setTimeout(function () { n.classList.remove(cls) }, 900);
+      }
 
-/* ---------- dock controls ---------- */
-function renderSpeed(){$$('#speed button').forEach(function(b){b.classList.toggle('active',b.dataset.speed===S.speed)})}
-function renderSound(){var b=$('#soundBtn');b.textContent=S.sound?'Sound on':'Sound off';b.setAttribute('aria-pressed',String(S.sound))}
-$$('#speed button').forEach(function(b){b.addEventListener('click',function(){S.speed=b.dataset.speed;store.set('speed',S.speed);renderSpeed()})});
-$('#soundBtn').addEventListener('click',function(){
-  S.sound=!S.sound;store.set('sound',S.sound);
-  if(!S.sound){txVoice.off();rxVoice.off();stopAllRx()}else ctx();
-  renderSound();
-});
+      /* ---------- decoder ---------- */
+      var D = { code: '', down: false, t0: 0, tUp: 0, sd: false, tDash: null, tLetter: null, tWord: null, tx: false };
+      var view = 'learn', started = false;
+      var keyEl = $('#key'), keyLabel = $('#keyLabel'), liveEl = $('#live'), symEl = $('#sym');
+      var liveLock = false, liveT = null;
+      function clearTimers() { clearTimeout(D.tDash); clearTimeout(D.tLetter); clearTimeout(D.tWord) }
+      function renderSignal() {
+        symEl.replaceChildren(D.code ? pads(D.code, 'sm lit') : '');
+        if (liveLock) return;
+        var r = D.code ? decode(D.code) : null;
+        if (r && r.kind === 'char') { liveEl.textContent = r.ch; liveEl.className = 'live guess' }
+        else if (r && r.kind === 'pro') { liveEl.textContent = r.name; liveEl.className = 'live guess' }
+        else { liveEl.textContent = D.code ? '?' : '·'; liveEl.className = 'live' }
+      }
+      function flashLive(txt, cls) {
+        liveLock = true; liveEl.textContent = txt; liveEl.className = 'live ' + cls;
+        clearTimeout(liveT); liveT = setTimeout(function () { liveLock = false; renderSignal() }, 900);
+      }
+      function keying(on, extra) {
+        if (!chat.room) return;
+        try { chat.room.presence({ k: on ? 1 : 0 }).catch(function () { }) } catch (e) { }
+        if (chat.mode !== 'audio') return;
+        if (on && view !== 'chat') return;
+        if (!on && !D.tx) return;
+        D.tx = on;
+        var data = { d: on ? 1 : 0 };
+        if (extra) { for (var k in extra) data[k] = extra[k] }
+        try { chat.room.emit('key', data).catch(function () { }) } catch (e) { }
+      }
+      function keyDown() {
+        if (view === 'guide' || D.down) return;
+        D.down = true; D.t0 = performance.now(); clearTimers();
+        var pause = D.tUp ? D.t0 - D.tUp : 1e9, gapKind = pause >= 7 * unit() ? 2 : (pause >= 3.5 * unit() ? 1 : 0);
+        liveLock = false; clearTimeout(liveT);
+        ctx(); txVoice.on(); lampTx(true); keyEl.classList.add('down');
+        try { if (navigator.vibrate) navigator.vibrate(8) } catch (e) { }
+        keyLabel.textContent = 'DOT';
+        D.tDash = setTimeout(function () { if (D.down) keyLabel.textContent = 'DASH' }, thr());
+        renderSignal();
+        if (view === 'chat') {
+          keying(true, { g: gapKind });
+          if (chat.joined && chat.mode === 'audio') { D.sd = true; stripDown('me', gapKind) }
+        }
+      }
+      function keyUp() {
+        if (!D.down) return;
+        D.down = false; clearTimeout(D.tDash);
+        var held = performance.now() - D.t0, sym = held >= thr() ? '-' : '.';
+        D.tUp = performance.now();
+        txVoice.off(); lampTx(false); keyEl.classList.remove('down'); keyLabel.textContent = 'KEY';
+        keying(false, { s: sym });
+        if (D.sd) { D.sd = false; stripUp('me', sym) }
+        D.code += sym;
+        renderSignal(); lightTree(D.code);
+        if (D.code.length >= 9) { commit(); return }
+        D.tLetter = setTimeout(commit, 3.5 * unit());
+      }
+      function commit() {
+        var code = D.code; D.code = '';
+        var res = decode(code);
+        lightTree('');
+        if (res.kind === 'char') { flashNode(code, 'hit'); flashLive(res.ch, 'ok') }
+        else if (res.kind === 'pro') { flashLive(res.name, 'ok') }
+        else flashLive('?', 'bad');
+        renderSignal();
+        handler().token(res, code);
+        D.tWord = setTimeout(function () { handler().gap() }, 3.5 * unit());
+      }
+      function resetDecoder() {
+        clearTimers();
+        if (D.down) { D.down = false; txVoice.off(); lampTx(false); keyEl.classList.remove('down'); keyLabel.textContent = 'KEY'; keying(false) }
+        D.code = ''; D.sd = false; liveLock = false; clearTimeout(liveT); renderSignal(); lightTree('');
+      }
+      keyEl.addEventListener('pointerdown', function (e) {
+        e.preventDefault();
+        try { keyEl.setPointerCapture(e.pointerId) } catch (_) { }
+        keyDown();
+      });
+      ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (t) { keyEl.addEventListener(t, keyUp) });
+      keyEl.addEventListener('contextmenu', function (e) { e.preventDefault() });
+      window.addEventListener('keydown', function (e) {
+        if (e.code !== 'Space' || e.repeat) return;
+        var t = e.target, tag = t && t.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (t && t.isContentEditable)) return;
+        if (tag === 'BUTTON' && t !== keyEl) return;
+        e.preventDefault(); keyDown();
+      });
+      window.addEventListener('keyup', function (e) { if (e.code === 'Space') keyUp() });
+      window.addEventListener('blur', keyUp);
 
-/* ---------- views ---------- */
-var VIEWS=['learn','chat','guide'];
-function setView(v){
-  if(VIEWS.indexOf(v)<0) v='learn';
-  if(started&&v===view) return;
-  resetDecoder();stopPlayback();stopAllRx();
-  view=v;started=true;
-  VIEWS.forEach(function(n){
-    $('#view-'+n).hidden=n!==v;
-    var t=$('#tab-'+n);t.classList.toggle('active',n===v);t.setAttribute('aria-selected',String(n===v));
-  });
-  $('#dock').hidden=v==='guide';
-  $('.views').scrollTop=0;
-  if(v==='chat') renderChat();
-  if(v==='learn') renderLearnMode();
-}
-$$('.tab').forEach(function(t){t.addEventListener('click',function(){
-  setView(t.dataset.v);
-  try{location.hash=t.dataset.v}catch(e){}
-})});
-window.addEventListener('hashchange',function(){setView(location.hash.slice(1))});
+      /* ---------- learn ---------- */
+      var LEVELS = [
+        { name: 'Lv 1', items: 'ETIANM'.split('') },
+        { name: 'Lv 2', items: 'SURWDKGO'.split('') },
+        { name: 'Lv 3', items: 'HVFLPJBXCYZQ'.split('') },
+        { name: 'Lv 4', items: '0123456789'.split('') },
+        { name: 'Words 1', items: ['EAT', 'TEA', 'TEN', 'NET', 'MAN', 'MEN', 'TIN', 'AIM', 'SUN', 'RUN', 'SIT', 'OUR', 'DOG', 'SEA', 'MOM', 'DAD'] },
+        { name: 'Words 2', items: ['HELLO', 'MORSE', 'CODE', 'DASH', 'BEEP', 'HELP', 'GOOD', 'PLAY', 'RADIO', 'HAPPY', 'WATER', 'FRIEND', 'SIGNAL', 'THANKS'] },
+        { name: 'Phrases', items: ['SOS', 'HELLO WORLD', 'GOOD MORNING', 'THANK YOU', 'SEE YOU SOON', 'I AM FINE', 'HOW ARE YOU', 'MORSE CODE', 'CALL ME'] }
+      ];
+      var L = { mode: store.get('lmode', 'explore'), level: store.get('level', 0), score: store.get('score', {}), target: null, pos: 0, hint: false, wrong: 0, lw: 0, locked: false, state: '', text: '' };
+      if (L.mode !== 'train' && L.mode !== 'explore') L.mode = 'explore';
+      if (!(L.level >= 0 && L.level < LEVELS.length)) L.level = 0;
+      var tmsgEl = $('#tmsg'), targetEl = $('#target');
+      function need(item) { return item.length > 1 ? 2 : 3 }
+      function seqOf(t) { return t.replace(/ /g, '') }
+      function learned(items) { var n = 0; items.forEach(function (it) { if ((L.score[it] || 0) >= need(it)) n++ }); return n }
 
-renderSpeed();renderSound();renderSignal();
-renderLearnMode();renderPeers([]);
-setView(location.hash.slice(1));
-})();
-</script>
+      function renderText(el, txt, ph) {
+        el.replaceChildren();
+        if (!txt) { var s = document.createElement('span'); s.className = 'ph'; s.textContent = ph; el.appendChild(s) }
+        else el.appendChild(document.createTextNode(txt));
+        var c = document.createElement('span'); c.className = 'caret'; el.appendChild(c);
+      }
+      function setExplore(ch, code, cap) {
+        $('#xLetter').textContent = ch;
+        $('#xPat').replaceChildren(code ? pads(code) : '');
+        $('#xCap').textContent = cap;
+      }
+      function renderExplore() { renderText($('#xText'), L.text, 'Your letters appear here') }
+      function renderLearnMode() {
+        $$('#lmode button').forEach(function (b) { b.classList.toggle('active', b.dataset.m === L.mode) });
+        $('#p-explore').hidden = L.mode !== 'explore';
+        $('#p-train').hidden = L.mode !== 'train';
+        if (L.mode === 'train') {
+          if (!L.target || LEVELS[L.level].items.indexOf(L.target) < 0) { L.target = pickTarget(); L.pos = 0 }
+          renderTrain();
+        } else renderExplore();
+      }
+      function pickTarget() {
+        var items = LEVELS[L.level].items, pool = [];
+        items.forEach(function (it) { var w = (L.score[it] || 0) >= need(it) ? 1 : 4; for (var j = 0; j < w; j++) pool.push(it) });
+        var t, n = 0;
+        do { t = pool[Math.floor(Math.random() * pool.length)]; n++ } while (t === L.target && n < 12);
+        return t;
+      }
+      function renderTarget() {
+        var t = L.target, el = targetEl;
+        el.className = 'target' + (t.length > 1 ? ' word' : '') + (L.state ? ' ' + L.state : '');
+        if (t.length === 1) { el.textContent = t; return }
+        el.replaceChildren();
+        var idx = 0;
+        for (var i = 0; i < t.length; i++) {
+          var s = document.createElement('span');
+          if (t[i] === ' ') { s.textContent = ' ' }
+          else {
+            s.textContent = t[i];
+            if (idx < L.pos) s.className = 'd';
+            else if (idx === L.pos && L.state !== 'ok') s.className = 'c';
+            idx++;
+          }
+          el.appendChild(s);
+        }
+      }
+      function renderTrain() {
+        var items = LEVELS[L.level].items;
+        $$('#levels button').forEach(function (b, i) { b.classList.toggle('active', i === L.level) });
+        var chips = items.map(function (it) {
+          var s = document.createElement('span'); s.className = 'chip' + (it === L.target ? ' cur' : '');
+          var d = document.createElement('i'); d.className = 'led' + ((L.score[it] || 0) >= need(it) ? ' on' : '');
+          s.appendChild(d); s.appendChild(document.createTextNode(it)); return s;
+        });
+        $('#chips').replaceChildren.apply($('#chips'), chips);
+        renderTarget();
+        var hr = $('#hintRow'); hr.replaceChildren();
+        var exp = seqOf(L.target)[L.pos];
+        if (L.hint && exp) {
+          hr.appendChild(pads(MORSE[exp]));
+          if (L.target.length > 1) { var lb = document.createElement('span'); lb.style.marginLeft = '10px'; lb.textContent = 'next letter'; hr.appendChild(lb) }
+        } else hr.textContent = 'Hint hidden';
+        $('#tHint').textContent = L.hint ? 'Hide hint' : 'Show hint';
+        $('#tProg').textContent = learned(items) + ' of ' + items.length + (items[0].length > 1 ? ' words learned' : ' letters learned');
+      }
+      function newTarget() {
+        L.locked = false; L.state = ''; L.pos = 0; L.lw = 0; L.wrong = 0; L.hint = false; L.target = pickTarget();
+      }
+      var resetArmed = false, resetT = null;
+      (function initLearn() {
+        var lv = $('#levels');
+        LEVELS.forEach(function (l, i) {
+          var b = document.createElement('button'); b.type = 'button'; b.textContent = l.name;
+          b.addEventListener('click', function () { L.level = i; store.set('level', i); L.target = null; newTarget(); tmsgEl.textContent = ''; renderTrain() });
+          lv.appendChild(b);
+        });
+        $$('#lmode button').forEach(function (b) {
+          b.addEventListener('click', function () {
+            L.mode = b.dataset.m; store.set('lmode', L.mode); resetDecoder(); stopPlayback(); renderLearnMode();
+          })
+        });
+        $('#xListen').addEventListener('click', function () { var ch = $('#xLetter').textContent; if (MORSE[ch]) { stopPlayback(); playText(ch) } });
+        $('#xClear').addEventListener('click', function () { L.text = ''; renderExplore() });
+        $('#tListen').addEventListener('click', function () { stopPlayback(); playText(L.target) });
+        $('#tHint').addEventListener('click', function () { L.hint = !L.hint; renderTrain() });
+        $('#tReset').addEventListener('click', function () {
+          var b = $('#tReset');
+          if (!resetArmed) { resetArmed = true; b.textContent = 'Tap again to confirm'; resetT = setTimeout(function () { resetArmed = false; b.textContent = 'Reset progress' }, 3000); return }
+          clearTimeout(resetT); resetArmed = false; b.textContent = 'Reset progress';
+          L.score = {}; store.set('score', L.score); L.pos = 0; L.hint = false; L.wrong = 0; L.lw = 0; L.state = ''; tmsgEl.textContent = 'Progress cleared.'; renderTrain();
+        });
+        setExplore('S', '...', 'Example. Tap the key three times to spell S.');
+      })();
+      function onNodeTap(code) {
+        if (view !== 'learn' || L.mode !== 'explore') return;
+        var ch = TREE[code]; setExplore(ch, code, 'From the chart. Listen, then try it on the key.');
+        stopPlayback(); playText(ch);
+      }
+      var learnHandler = {
+        token: function (res, code) {
+          if (L.mode === 'explore') {
+            if (res.kind === 'char') {
+              L.text = (L.text + res.ch).slice(-80); setExplore(res.ch, code, 'You keyed');
+            } else if (res.kind === 'pro') {
+              if (res.name === 'ERR') L.text = L.text.slice(0, -1);
+              setExplore(res.name, code, res.name === 'AR' ? 'AR means end of message' : 'ERR means erase');
+            } else setExplore('?', code, 'No letter has that pattern. Try again.');
+            renderExplore(); return;
+          }
+          if (L.locked) return;
+          var ch = res.kind === 'char' ? res.ch : null;
+          var seq = seqOf(L.target), exp = seq[L.pos], isWord = seq.length > 1;
+          if (ch === exp) {
+            L.pos++; L.lw = 0; L.hint = false;
+            if (L.pos >= seq.length) {
+              L.score[L.target] = (L.score[L.target] || 0) + 1; store.set('score', L.score);
+              L.locked = true; L.state = 'ok';
+              var items = LEVELS[L.level].items;
+              tmsgEl.textContent = learned(items) === items.length ? 'Level complete. Try the next level.' : (isWord ? 'Word complete.' : 'Correct.');
+              renderTrain();
+              setTimeout(function () { newTarget(); if (L.mode === 'train') { tmsgEl.textContent = ''; renderTrain() } }, isWord ? 1300 : 950);
+            } else {
+              tmsgEl.textContent = ''; renderTrain();
+            }
+          } else {
+            L.wrong++; L.lw++; L.state = 'bad';
+            var got = res.kind === 'char' ? res.ch : (res.kind === 'pro' ? res.name : '?');
+            tmsgEl.textContent = 'You keyed ' + got + '. ' + (isWord ? 'Next letter ' + exp : exp) + ' is ' + MORSE[exp].replace(/\./g, '·').replace(/-/g, '−') + '.';
+            if (L.lw >= 2) L.hint = true;
+            renderTrain();
+            setTimeout(function () { if (L.state === 'bad') { L.state = ''; if (L.mode === 'train') renderTrain() } }, 700);
+          }
+        },
+        gap: function () {
+          if (L.mode === 'explore' && L.text && L.text.slice(-1) !== ' ') { L.text += ' '; renderExplore() }
+        }
+      };
+
+      /* ---------- chat ---------- */
+      var COLORS = ['#38f05f', '#ff8a2b', '#5ec8ff', '#ff6fd0', '#ffd84a', '#b69bff'];
+      var chat = { joined: false, room: null, name: store.get('nick', ''), code: store.get('room', ''), color: store.get('col', null), mode: store.get('cmode', 'audio'), draft: '', unsubs: [], live: false, names: {}, colors: {}, unread: false, morse: store.get('morse', true) !== false };
+      if (chat.mode !== 'audio' && chat.mode !== 'text') chat.mode = 'audio';
+      if (!(chat.color >= 0 && chat.color < COLORS.length)) { chat.color = Math.floor(Math.random() * COLORS.length); store.set('col', chat.color) }
+      var roomP = (window.claude && window.claude.use) ? window.claude.use('room').catch(function () { return null }) : Promise.resolve(null);
+      var WORDS = ['dot', 'dash', 'beep', 'tick', 'wave', 'spark', 'relay', 'echo', 'pulse', 'signal'];
+      function cleanName(s) { return String(s).replace(/[^\w .-]/g, '').trim().slice(0, 14) }
+      function cleanRoom(s) { return String(s).toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9_.-]/g, '').replace(/^[^a-z0-9]+/, '').slice(0, 32) }
+      function cleanText(s) { return String(s).toUpperCase().replace(/[^A-Z0-9 .,?!\/]/g, '').replace(/\s+/g, ' ').trim().slice(0, 200) }
+      var logEl = $('#log'), peersEl = $('#peers');
+
+      /* live audio from friends: one tone per person while their key is down */
+      var peerVoices = {};
+      function peerFreq(peer) { var h = 0; for (var i = 0; i < peer.length; i++) h = (h * 31 + peer.charCodeAt(i)) >>> 0; return 420 + (h % 7) * 40 }
+      function updateHeard() {
+        var names = [];
+        Object.keys(peerVoices).forEach(function (k) { if (peerVoices[k].on) names.push(chat.names[k] || 'Friend') });
+        lampRx(names.length > 0);
+        var h = $('#heard');
+        if (!chat.room) { h.textContent = 'No live connection'; h.className = 'heard' }
+        else if (names.length) { h.textContent = names.join(', ') + ' keying'; h.className = 'heard on' }
+        else { h.textContent = 'Quiet'; h.className = 'heard' }
+      }
+      /* dots and dashes drawn as people key; each row fades after a few seconds of silence */
+      var strips = {}, stripsEl = $('#strips'), IDLE = 3500, MAXPADS = 60;
+      function stripRow(id) {
+        var r = strips[id];
+        if (!r) {
+          var el = document.createElement('div'); el.className = 'srow';
+          var lab = document.createElement('div'); lab.className = 'slabel';
+          var dot = document.createElement('i'); dot.className = 'dotc';
+          var nm = document.createElement('b');
+          lab.appendChild(dot); lab.appendChild(nm);
+          var line = document.createElement('div'); line.className = 'sline';
+          el.appendChild(lab); el.appendChild(line); stripsEl.appendChild(el);
+          r = strips[id] = { el: el, line: line, nm: nm, dot: dot, live: null, t: null, t2: null, n: 0 };
+        }
+        var me = id === 'me', ci = me ? chat.color : chat.colors[id];
+        r.nm.textContent = me ? 'You' : (chat.names[id] || 'Friend');
+        r.dot.style.background = COLORS[ci >= 0 && ci < COLORS.length ? ci : 0];
+        return r;
+      }
+      function stripPad(sym, live) { var p = document.createElement('span'); p.className = 'pad ' + (sym === '-' ? 'dash' : 'dot') + (live ? ' hold' : ''); return p }
+      function stripTrim(r) {
+        while (r.n > MAXPADS && r.line.firstChild) {
+          if (r.line.firstChild.classList.contains('pad')) r.n--;
+          r.line.removeChild(r.line.firstChild);
+        }
+      }
+      function stripIdle(id, r) {
+        clearTimeout(r.t); clearTimeout(r.t2);
+        r.t = setTimeout(function () {
+          r.el.classList.add('fade');
+          r.t2 = setTimeout(function () {
+            if (r.el.parentNode) r.el.parentNode.removeChild(r.el);
+            if (strips[id] === r) delete strips[id];
+          }, 480);
+        }, IDLE);
+      }
+      function stripDown(id, g) {
+        var r = stripRow(id); clearTimeout(r.t); clearTimeout(r.t2); r.el.classList.remove('fade');
+        if (r.live) { r.live.className = 'pad dash'; r.live = null }
+        if (r.n > 0 && g > 0) { var s = document.createElement('span'); s.className = 'gap' + (g === 2 ? ' word' : ''); r.line.appendChild(s) }
+        r.live = stripPad('.', true); r.line.appendChild(r.live); r.n++; stripTrim(r);
+      }
+      function stripUp(id, sym) {
+        var r = stripRow(id);
+        if (r.live) { r.live.className = 'pad ' + (sym === '-' ? 'dash' : 'dot'); r.live = null }
+        else { r.line.appendChild(stripPad(sym)); r.n++; stripTrim(r) }
+        stripIdle(id, r);
+      }
+      function stripEnd(id) {
+        var r = strips[id]; if (!r) return;
+        if (r.live) { r.live.className = 'pad dash'; r.live = null }
+        stripIdle(id, r);
+      }
+      function clearStrips() {
+        Object.keys(strips).forEach(function (id) {
+          var r = strips[id]; clearTimeout(r.t); clearTimeout(r.t2);
+          if (r.el.parentNode) r.el.parentNode.removeChild(r.el);
+        });
+        strips = {};
+      }
+      function rxStop(peer) {
+        var p = peerVoices[peer]; if (!p) return;
+        clearTimeout(p.t); p.v.off(); p.on = false; updateHeard();
+      }
+      function stopAllRx() { Object.keys(peerVoices).forEach(rxStop) }
+      function rxKey(msg) {
+        if (msg.isMe || view !== 'chat' || chat.mode !== 'audio') return;
+        var d = msg.data; if (!d || typeof d !== 'object') return;
+        var peer = String(msg.peer), p = peerVoices[peer];
+        if (!p) p = peerVoices[peer] = { v: voice(peerFreq(peer), 0.14), on: false, t: null };
+        clearTimeout(p.t);
+        if (d.d === 1) {
+          p.v.on(); p.on = true;
+          stripDown(peer, (d.g === 1 || d.g === 2) ? d.g : 0);
+          p.t = setTimeout(function () { stripEnd(peer); rxStop(peer) }, 2500);
+          updateHeard();
+        } else {
+          if (d.s === '.' || d.s === '-') stripUp(peer, d.s); else stripEnd(peer);
+          rxStop(peer);
+        }
+      }
+
+      function renderDraft() { renderText($('#draft'), chat.draft, 'Key a message') }
+      function renderChatMode() {
+        $$('#cmode button').forEach(function (b) {
+          b.classList.toggle('active', b.dataset.m === chat.mode);
+          if (b.dataset.m === 'text') b.textContent = chat.unread ? 'Text •' : 'Text';
+        });
+        $('#audioPane').hidden = chat.mode !== 'audio';
+        stripsEl.hidden = !chat.morse;
+        $('#morseBtn').textContent = chat.morse ? 'Morse on' : 'Morse off';
+        $('#morseBtn').setAttribute('aria-pressed', String(chat.morse));
+        $('#textPane').hidden = chat.mode !== 'text';
+      }
+      function renderChat() {
+        $('#join').hidden = chat.joined; $('#room').hidden = !chat.joined;
+        if (!chat.joined) { $('#nick').value = chat.name; $('#roomCode').value = chat.code }
+        else { renderChatMode(); renderDraft(); updateHeard(); logEl.scrollTop = logEl.scrollHeight }
+        $('#autoBtn').textContent = S.auto ? 'Auto-play on' : 'Auto-play off';
+        $('#autoBtn').setAttribute('aria-pressed', String(S.auto));
+      }
+      function setStatus(live, text) {
+        chat.live = live; $('#status').classList.toggle('up', live);
+        $('#status .led').classList.toggle('on', live); $('#statusText').textContent = text;
+      }
+      function emptyLog() {
+        logEl.replaceChildren();
+        var d = document.createElement('div'); d.className = 'empty'; d.id = 'logEmpty';
+        d.textContent = 'No messages yet. Key a message and send it with AR.'; logEl.appendChild(d);
+      }
+      function addMsg(m, me) {
+        var e = $('#logEmpty'); if (e) e.remove();
+        var d = document.createElement('div'); d.className = 'm' + (me ? ' me' : '');
+        var w = document.createElement('div'); w.className = 'who';
+        var i = document.createElement('i'); i.className = 'dotc'; i.style.background = COLORS[m.c];
+        w.appendChild(i); w.appendChild(document.createTextNode(me ? m.n + ' (you)' : m.n));
+        var wave = document.createElement('div'); wave.className = 'wave'; wave.setAttribute('aria-hidden', 'true');
+        var cnt = 0;
+        m.t.split('').forEach(function (ch) {
+          if (cnt > 60) return;
+          if (ch === ' ') { var g = document.createElement('i'); g.className = 'wg'; wave.appendChild(g); return }
+          var c = MORSE[ch]; if (!c) return;
+          var lt = pads(c, 'sm'); lt.classList.add('lt'); wave.appendChild(lt); cnt += c.length;
+        });
+        var acts = document.createElement('div'); acts.className = 'acts';
+        var pb = document.createElement('button'); pb.type = 'button'; pb.className = 'play go'; pb.textContent = 'PLAY';
+        pb.setAttribute('aria-label', 'Play message as Morse');
+        pb.addEventListener('click', function () { stopPlayback(); playText(m.t) });
+        var t = document.createElement('div'); t.className = 'txt'; t.textContent = m.t; t.hidden = true;
+        var tb = document.createElement('button'); tb.type = 'button'; tb.className = 'play'; tb.textContent = 'TEXT';
+        tb.setAttribute('aria-expanded', 'false');
+        tb.addEventListener('click', function () {
+          t.hidden = !t.hidden; tb.textContent = t.hidden ? 'TEXT' : 'HIDE'; tb.setAttribute('aria-expanded', String(!t.hidden));
+          logEl.scrollTop = Math.min(logEl.scrollTop, logEl.scrollHeight);
+        });
+        acts.appendChild(pb); acts.appendChild(tb);
+        d.appendChild(w); d.appendChild(wave); d.appendChild(acts); d.appendChild(t); logEl.appendChild(d);
+        while (logEl.children.length > 60) logEl.removeChild(logEl.firstChild);
+        logEl.scrollTop = logEl.scrollHeight;
+      }
+      function renderPeers(list) {
+        var out = [];
+        chat.names = {}; chat.colors = {};
+        if (!list || !list.length) {
+          var s = document.createElement('span'); s.className = 'chip'; var d = document.createElement('i'); d.className = 'led';
+          s.appendChild(d); s.appendChild(document.createTextNode((chat.name || 'Friend') + ' (you)')); out.push(s);
+        } else list.forEach(function (p) {
+          var pr = p.presence || {};
+          var nm = cleanName(String(pr.n || '')) || 'Friend';
+          chat.names[p.peer] = nm;
+          if (typeof pr.c === 'number') chat.colors[p.peer] = pr.c;
+          var s = document.createElement('span'); s.className = 'chip';
+          var d = document.createElement('i'); d.className = 'led' + (pr.k === 1 ? ' on' : '');
+          s.appendChild(d); s.appendChild(document.createTextNode(nm + (p.isMe && p.sameTab ? ' (you)' : ''))); out.push(s);
+        });
+        peersEl.replaceChildren.apply(peersEl, out);
+      }
+      function parseMsg(d) {
+        if (!d || typeof d !== 'object') return null;
+        var t = cleanText(d.t || ''); if (!t) return null;
+        var c = (typeof d.c === 'number' && d.c >= 0 && d.c < COLORS.length && d.c % 1 === 0) ? d.c : 0;
+        return { t: t, n: cleanName(String(d.n || '')) || 'Friend', c: c };
+      }
+      async function joinRoom() {
+        var name = cleanName($('#nick').value) || 'Friend';
+        var code = cleanRoom($('#roomCode').value);
+        var note = $('#joinNote');
+        if (code.length < 3) { note.textContent = 'Room codes need at least 3 letters or numbers.'; return }
+        ctx();
+        chat.name = name; chat.code = code; store.set('nick', name); store.set('room', code);
+        var btn = $('#joinBtn'); btn.disabled = true; note.textContent = 'Connecting...';
+        var ns = await roomP, nr = null, err = '';
+        if (ns) {
+          try { nr = await ns.join(code) } catch (e) { err = (e && e.code) || 'error' }
+        }
+        btn.disabled = false; note.textContent = '';
+        chat.room = nr; chat.draft = ''; chat.joined = true; chat.unread = false;
+        $('#roomName').textContent = code;
+        emptyLog();
+        if (nr) {
+          setStatus(nr.connected(), nr.connected() ? 'LIVE' : 'CONNECTING');
+          chat.unsubs = [
+            nr.on('chat', function (msg) {
+              if (msg.sameTab) return;
+              var m = parseMsg(msg.data); if (!m) return;
+              addMsg(m, !!msg.isMe);
+              if (!msg.isMe) {
+                if (chat.mode === 'text') { if (S.auto && m.t.length <= 40) queuePlay(m.t) }
+                else { chat.unread = true; renderChatMode() }
+              }
+            }, function () { setStatus(false, 'OFFLINE') }),
+            nr.on('key', rxKey, function () { }),
+            nr.onPeers(function (ch) {
+              renderPeers(ch.peers);
+              ch.left.forEach(function (p) { stripEnd(p.peer); rxStop(p.peer) });
+              updateHeard();
+            }, function () { }),
+            nr.onConnection(function (c) { setStatus(c, c ? 'LIVE' : 'CONNECTING') }, function () { setStatus(false, 'OFFLINE') })
+          ];
+          try { nr.presence({ n: name, c: chat.color, k: 0 }).catch(function () { }) } catch (e) { }
+        } else {
+          setStatus(false, 'LOCAL'); renderPeers([]);
+          var d = document.createElement('div'); d.className = 'empty';
+          d.textContent = err ? 'The live channel did not open (' + err + '). Messages stay on this device.' : 'No live connection in this view. Messages stay on this device.';
+          logEl.appendChild(d);
+        }
+        renderChat();
+      }
+      function leaveRoom() {
+        stopPlayback(); stopAllRx(); clearStrips();
+        chat.unsubs.forEach(function (u) { try { u() } catch (e) { } }); chat.unsubs = [];
+        if (chat.room) { try { chat.room.leave().catch(function () { }) } catch (e) { } }
+        chat.room = null; chat.joined = false; chat.draft = '';
+        resetDecoder(); renderChat();
+      }
+      function sendDraft() {
+        var t = cleanText(chat.draft);
+        if (!t) { flashLive('?', 'bad'); return }
+        var m = { t: t, n: chat.name || 'Friend', c: chat.color };
+        addMsg(m, true);
+        if (chat.room) { chat.room.emit('chat', m).catch(function () { setStatus(false, 'OFFLINE') }) }
+        chat.draft = ''; renderDraft();
+      }
+      var chatHandler = {
+        token: function (res) {
+          if (!chat.joined || chat.mode !== 'text') return;
+          if (res.kind === 'char') { chat.draft = (chat.draft + res.ch).slice(0, 200); renderDraft() }
+          else if (res.kind === 'pro') {
+            if (res.name === 'AR') sendDraft();
+            else { chat.draft = chat.draft.replace(/\s+$/, '').slice(0, -1); renderDraft() }
+          }
+        },
+        gap: function () {
+          if (chat.joined && chat.mode === 'text' && chat.draft && chat.draft.slice(-1) !== ' ') { chat.draft += ' '; renderDraft() }
+        }
+      };
+      function handler() { return view === 'chat' ? chatHandler : learnHandler }
+      (function initChat() {
+        $('#joinBtn').addEventListener('click', joinRoom);
+        $('#newRoom').addEventListener('click', function () {
+          $('#roomCode').value = WORDS[Math.floor(Math.random() * WORDS.length)] + '-' + (100 + Math.floor(Math.random() * 900));
+        });
+        $('#roomCode').addEventListener('keydown', function (e) { if (e.key === 'Enter') joinRoom() });
+        $('#leaveBtn').addEventListener('click', leaveRoom);
+        $('#send').addEventListener('click', sendDraft);
+        $('#bk').addEventListener('click', function () { chat.draft = chat.draft.replace(/\s+$/, '').slice(0, -1); renderDraft() });
+        $('#sp').addEventListener('click', function () { if (chat.draft && chat.draft.slice(-1) !== ' ') { chat.draft += ' '; renderDraft() } });
+        $('#morseBtn').addEventListener('click', function () { chat.morse = !chat.morse; store.set('morse', chat.morse); renderChatMode() });
+        $('#autoBtn').addEventListener('click', function () { S.auto = !S.auto; store.set('auto', S.auto); if (!S.auto) stopPlayback(); renderChat() });
+        $$('#cmode button').forEach(function (b) {
+          b.addEventListener('click', function () {
+            chat.mode = b.dataset.m; store.set('cmode', chat.mode);
+            if (chat.mode === 'text') chat.unread = false;
+            resetDecoder(); stopPlayback(); stopAllRx(); clearStrips(); renderChatMode(); updateHeard();
+          })
+        });
+        $('#copyBtn').addEventListener('click', function () {
+          var b = $('#copyBtn'), txt = chat.code;
+          var fallback = function () {
+            var r = document.createRange(); r.selectNodeContents($('#roomName'));
+            var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Selected';
+          };
+          try {
+            navigator.clipboard.writeText(txt).then(function () { b.textContent = 'Copied' }, fallback);
+          } catch (e) { fallback() }
+          setTimeout(function () { b.textContent = 'Copy code' }, 1800);
+        });
+      })();
+
+      /* ---------- guide ---------- */
+      (function initGuide() {
+        var host = $('#codes');
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('').forEach(function (ch) {
+          var d = document.createElement('div'); d.className = 'code';
+          var s = document.createElement('span'); s.className = 'ch'; s.textContent = ch;
+          d.appendChild(s); d.appendChild(pads(MORSE[ch], 'sm')); host.appendChild(d);
+        });
+        $$('[data-pat]').forEach(function (el) { el.appendChild(pads(el.dataset.pat, 'sm')) });
+      })();
+
+      /* ---------- dock controls ---------- */
+      function renderSpeed() { $$('#speed button').forEach(function (b) { b.classList.toggle('active', b.dataset.speed === S.speed) }) }
+      function renderSound() { var b = $('#soundBtn'); b.textContent = S.sound ? 'Sound on' : 'Sound off'; b.setAttribute('aria-pressed', String(S.sound)) }
+      $$('#speed button').forEach(function (b) { b.addEventListener('click', function () { S.speed = b.dataset.speed; store.set('speed', S.speed); renderSpeed() }) });
+      $('#soundBtn').addEventListener('click', function () {
+        S.sound = !S.sound; store.set('sound', S.sound);
+        if (!S.sound) { txVoice.off(); rxVoice.off(); stopAllRx() } else ctx();
+        renderSound();
+      });
+
+      /* ---------- views ---------- */
+      var VIEWS = ['learn', 'chat', 'guide'];
+      function setView(v) {
+        if (VIEWS.indexOf(v) < 0) v = 'learn';
+        if (started && v === view) return;
+        resetDecoder(); stopPlayback(); stopAllRx(); clearStrips();
+        view = v; started = true;
+        VIEWS.forEach(function (n) {
+          $('#view-' + n).hidden = n !== v;
+          var t = $('#tab-' + n); t.classList.toggle('active', n === v); t.setAttribute('aria-selected', String(n === v));
+        });
+        $('#dock').hidden = v === 'guide';
+        $('.views').scrollTop = 0;
+        if (v === 'chat') renderChat();
+        if (v === 'learn') renderLearnMode();
+      }
+      $$('.tab').forEach(function (t) {
+        t.addEventListener('click', function () {
+          setView(t.dataset.v);
+          try { location.hash = t.dataset.v } catch (e) { }
+        })
+      });
+      window.addEventListener('hashchange', function () { setView(location.hash.slice(1)) });
+
+      renderSpeed(); renderSound(); renderSignal();
+      renderLearnMode(); renderPeers([]);
+      setView(location.hash.slice(1));
+    })();
+  </script>
 
 </body>
+
 </html>
